@@ -26,7 +26,7 @@ response = requests.get("https://discord.com/api/channels/" + channel_id, header
 })
 while (response.status_code != 200): #fino a quando è valido lo continuo a chiedere e controllo se quello inserito è valido
     print("There was an error, the channel id isn't valid. Try again!")
-    channel_id = input("Insert the channel id ") or config.channel_id
+    channel_id = input("Insert the channel id ")
     response = requests.get("https://discord.com/api/channels/" + channel_id, headers = {
     "authorization": "Bot " + bot_token
 })
