@@ -41,4 +41,4 @@ def post_msg(msg: str): #use a function because is better
         print("There was an error, try again!") #write that there was an error
     else :
         print("The message has been sent successfully!") #else write that the message has been sent successfully
-post_msg(message) #run the function
+post_msg(message) #run the function with the requested param
