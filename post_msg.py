@@ -9,7 +9,7 @@ response = get("https://discord.com/api/auth/login", headers = { #check if the t
     "authorization": "Bot " + bot_token
 })
 while (response.status_code != 200): #until is valid it asks for a new token and check again
-    print("There was an error, the bot token isn't valid. Try again!")
+    print("There was an error, try again!")
     bot_token = input("Insert the bot token ")
     response = get("https://discord.com/api/auth/login", headers = {
     "authorization": "Bot " + bot_token
@@ -23,7 +23,7 @@ response = get("https://discord.com/api/channels/" + channel_id, headers = { #ch
     "authorization": "Bot " + bot_token
 })
 while (response.status_code != 200): #until is valid it asks for a new id and check again
-    print("There was an error, the channel id isn't valid. Try again!")
+    print("There was an error, try again!")
     channel_id = input("Insert the channel id ")
     response = get("https://discord.com/api/channels/" + channel_id, headers = {
     "authorization": "Bot " + bot_token
