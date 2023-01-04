@@ -1,7 +1,7 @@
 import requests #importo la libreria request che uso per la richiesta POST
 import shutil #importo la libreia shutil che mi servirà per rimuovere una cartella
 import os #importo la libreria os per controllare se esiste la cartella
-import config #importo il file config.py (puoi fare semplicemente invio nell'input e userà i valori del file di configurazione)
+import config #importo il file config.py (userà i valori del file di configurazione se non nulli, altrimenti li chiederà all'utente)
 if (os.path.exists("./__pycache__")): #se esiste
     shutil.rmtree("./__pycache__") #rimuovo la cartella __pycache__ perchè è inutile
 if (config.bot_token != None): #se il token nel file config.py non è nullo
