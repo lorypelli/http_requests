@@ -6,6 +6,7 @@ if (path.exists("./__pycache__")): #if exists
     rmtree("./__pycache__") #delete the __pycache__ folder because it's unuseful for my project
 if (bot_token != ""): #if the token in the config.py file is not null
     bot_token = bot_token #it will be the token
+    print("The bot token has been taken from the config,py file")
 else :
     bot_token = input("Insert the bot token ") #else the program will receive it from input
 response = get("https://discord.com/api/auth/login", headers = { #check if the token is valid
@@ -19,6 +20,7 @@ while (response.status_code != 200): #until is valid it asks for a new token and
 })
 if (channel_id != ""): #if the id in the config.py file is not null
     channel_id = channel_id #it will be the id
+    print("The channel id has been taken from the config,py file")
 else :
     channel_id = input("Insert the channel id ") #else the program will receive it from input
 response = get("https://discord.com/api/channels/" + channel_id, headers = { #check if the id is valid
