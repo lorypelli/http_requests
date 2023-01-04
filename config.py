@@ -1,2 +1,2 @@
-bot_token="" #inserire una stringa valida
-channel_id="" #inserire una stringa valida
+bot_token="" #provide a valid string
+channel_id="" #provide a valid string

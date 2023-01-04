@@ -1,44 +1,44 @@
-from requests import get, post #importo la libreria request che uso per la richiesta POST
-from shutil import rmtree #importo la libreia shutil che mi servirà per rimuovere una cartella
-from os import path #importo la libreria os per controllare se esiste la cartella
-from config import bot_token, channel_id #importo il file config.py (userà i valori del file di configurazione se non nulli, altrimenti li chiederà all'utente)
-if (path.exists("./__pycache__")): #se esiste
-    rmtree("./__pycache__") #rimuovo la cartella __pycache__ perchè è inutile per il mio progetto, se fosse un progetto grande, la terrei
-if (bot_token != None): #se il token nel file config.py non è nullo
-    bot_token = bot_token #allora quello sarà il token
+from requests import get, post #the library requests it's used to make POST and GET requests
+from shutil import rmtree #I use this to remvoe a folder
+from os import path #I use this to check if the folder exists
+from config import bot_token, channel_id #Values will be used if not null
+if (path.exists("./__pycache__")): #if exists
+    rmtree("./__pycache__") #delete the __pycache__ folder because it's unuseful for my project
+if (bot_token != None): #if the token in the config.py file is not null
+    bot_token = bot_token #it will be the token
 else :
-    bot_token = input("Insert the bot token ") #altrimenti lo ricevo in input
-response = get("https://discord.com/api/auth/login", headers = { #controllo se il token è valido
+    bot_token = input("Insert the bot token ") #else the program will receive it from input
+response = get("https://discord.com/api/auth/login", headers = { #check if the token is valid
     "authorization": "Bot " + bot_token
 })
-while (response.status_code != 200): #fino a quando è valido lo continuo a chiedere e controllo se quello inserito è valido
+while (response.status_code != 200): #until is valid it asks for a new token and check again
     print("There was an error, the bot token isn't valid. Try again!")
     bot_token = input("Insert the bot token ")
     response = get("https://discord.com/api/auth/login", headers = {
     "authorization": "Bot " + bot_token
 })
-if (channel_id != None): #se l'id nel file config.py non è nullo
-    channel_id = channel_id #allora quello sarà l'id
+if (channel_id != None): #if the id in the config.py file is not null
+    channel_id = channel_id #it will be the id
 else :
-    channel_id = input("Insert the channel id ") #altrimenti lo ricevo in input
-response = get("https://discord.com/api/channels/" + channel_id, headers = { #controllo se l'id è valido
+    channel_id = input("Insert the channel id ") #else the program will receive it from input
+response = get("https://discord.com/api/channels/" + channel_id, headers = { #check if the id is valid
     "authorization": "Bot " + bot_token
 })
-while (response.status_code != 200): #fino a quando è valido lo continuo a chiedere e controllo se quello inserito è valido
+while (response.status_code != 200): #until is valid it asks for a new id and check again
     print("There was an error, the channel id isn't valid. Try again!")
     channel_id = input("Insert the channel id ")
     response = get("https://discord.com/api/channels/" + channel_id, headers = {
     "authorization": "Bot " + bot_token
 })
-message = input("Insert the message ") #chiedo di inserire un messaggio all'utente
-def post_msg(msg: str): #faccio una funzione per semplificare il tutto
-    response = post("https://discord.com/api/channels/" + channel_id + "/messages", headers = { #faccio una richiesta con i vari parametri ricevuti in input
+message = input("Insert the message ") #asks to the user for a message input
+def post_msg(msg: str): #use a function because is better
+    response = post("https://discord.com/api/channels/" + channel_id + "/messages", headers = { #make a request with input params
         "authorization": "Bot " + bot_token
     }, data = {
         "content": msg
     })
-    if (response.status_code != 200): #se fallisce
-        print("There was an error, try again!") #lo scrive in output
+    if (response.status_code != 200): #if it fails
+        print("There was an error, try again!") #write that there was an error
     else :
-        print("The message has been sent successfully!") #altrimenti scrive in outuput che ha inviato il messaggio con successo
-post_msg(message) #esegue la funzione dichiarata prima con il parametro richiesto
+        print("The message has been sent successfully!") #else write that the message has been sent successfully
+post_msg(message) #run the function
