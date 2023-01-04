@@ -1,9 +1,5 @@
 from requests import get, post #the library requests it's used to make POST and GET requests
-from shutil import rmtree #I use this to remove a folder
-from os import path #I use this to check if the folder exists
 from config import bot_token, channel_id #Values will be used if not null
-if (path.exists("./__pycache__")): #if exists
-    rmtree("./__pycache__") #delete the __pycache__ folder because it's unuseful for my project
 if (bot_token != ""): #if the token in the config.py file is not null
     bot_token = bot_token #it will be the token
     print("The bot token has been taken from the config.py file")
