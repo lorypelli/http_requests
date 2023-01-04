@@ -1,5 +1,5 @@
 from requests import get, post #the library requests it's used to make POST and GET requests
-from shutil import rmtree #I use this to remvoe a folder
+from shutil import rmtree #I use this to remove a folder
 from os import path #I use this to check if the folder exists
 from config import bot_token, channel_id #Values will be used if not null
 if (path.exists("./__pycache__")): #if exists
