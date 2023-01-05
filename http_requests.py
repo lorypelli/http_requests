@@ -39,7 +39,7 @@ while (response.status_code != 200): #until is valid it asks for a new id and ch
     response = get("https://discord.com/api/channels/" + channel_id, headers = {
     "authorization": "Bot " + bot_token
 })
-menu_title = "Do you want to write a new message or delete a channel? (J / K to move)" #the menu title
+menu_title = "Do you want to write a new message or delete an existing channel? (J / K to move)" #the menu title
 menu_options = ["Write a message", "Delete a channel (this will use channel id you already provided)"] #the menu options
 option, index = pick(menu_options, menu_title, indicator="–>") #pick an option
 print(option) #write the option
