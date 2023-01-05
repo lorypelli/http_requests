@@ -1,4 +1,5 @@
-from requests import get, post #the library requests it's used to make POST and GET requests
+from requests import get, post, delete #the library requests it's used to make POST and GET requests
+from pick import pick
 from shutil import rmtree #I use this to remove a folder
 from os import path #I use this to check if the folder exists
 from config import bot_token, channel_id #Values will be used if not null
@@ -38,15 +39,31 @@ while (response.status_code != 200): #until is valid it asks for a new id and ch
     response = get("https://discord.com/api/channels/" + channel_id, headers = {
     "authorization": "Bot " + bot_token
 })
-message = input("Insert the message ") #asks to the user for a message input
-def post_msg(msg: str): #use a function because is better
-    response = post("https://discord.com/api/channels/" + channel_id + "/messages", headers = { #make a request with input params
-        "authorization": "Bot " + bot_token
-    }, data = {
-        "content": msg
-    })
-    if (response.status_code != 200): #if it fails
-        print("There was an error, try again!") #write that there was an error
-    else :
-        print("The message has been sent successfully!") #else write that the message has been sent successfully
-post_msg(message) #run the function with the requested param
+menu_title = "Do you want to write a new message or remove an existing message (J / K to move)" #the menu title
+menu_options = ["Write a message", "Delete a channel (this will use channel id you already provided)"] #the menu options
+option, index = pick(menu_options, menu_title, indicator="–>") #pick an option
+print(option) #write the option
+if (index == 1): #if option index it's 1 (not 2 because an array starts with 0)
+    def delete_chn(chn_id: str): #use a function because is better
+        response = delete("https://discord.com/api/channels/" + chn_id, headers = { #make a request with input params
+            "authorization": "Bot " + bot_token
+        })
+        if (response.status_code != 200): #if it fails
+            print(response.status_code)
+            print("There was an error, try again!") #write that there was an error
+        else :
+            print("The channel has been deleted successfully!") #else write that the channel has been deleted successfully
+    delete_chn(channel_id)
+else: #else option it's equal to 0
+    message = input("Insert the message ") #asks to the user for a message input
+    def post_msg(msg: str): #use a function because is better
+        response = post("https://discord.com/api/channels/" + channel_id + "/messages", headers = { #make a request with input params
+            "authorization": "Bot " + bot_token
+        }, data = {
+            "content": msg
+        })
+        if (response.status_code != 200): #if it fails
+            print("There was an error, try again!") #write that there was an error
+        else :
+            print("The message has been sent successfully!") #else write that the message has been sent successfully
+    post_msg(message) #run the function with the requested param
