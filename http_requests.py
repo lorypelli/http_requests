@@ -53,7 +53,7 @@ if (index == 1): #if option index it's 1 (not 2 because an array starts with 0)
             print("There was an error, try again!") #write that there was an error
         else :
             print("The channel has been deleted successfully!") #else write that the channel has been deleted successfully
-    delete_chn(channel_id)
+    delete_chn(channel_id) #run the function with the requested param
 else: #else option it's equal to 0
     message = input("Insert the message ") #asks to the user for a message input
     def post_msg(msg: str): #use a function because is better
