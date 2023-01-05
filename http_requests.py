@@ -1,8 +1,8 @@
-from requests import get, post, delete #the library requests it's used to make POST and GET requests
+from requests import get, post, delete #the library requests it's used to make POST, GET and DELETE requests
 from pick import pick
 from shutil import rmtree #I use this to remove a folder
 from os import path #I use this to check if the folder exists
-from config import bot_token, channel_id #Values will be used if not null
+from config import bot_token, channel_id #these values will be used if not null
 if (path.exists("./__pycache__")): #if exists
     rmtree("./__pycache__") #delete the __pycache__ folder because it's unuseful for my project
 response = get("https://discord.com/api/auth/login", headers = { #check if the token is valid
