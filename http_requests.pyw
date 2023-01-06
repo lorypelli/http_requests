@@ -55,7 +55,7 @@ while True:
             window["logged_in_as"].Update("Logged in as")
         elif (response.status_code == 200 and event == "Validate"):
             PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
-            response = get("https://discord.com/api/v10/users/@me", headers = {
+            response = get("https://discord.com/api/users/@me", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
             })
             window["logged_in_as"].Update("Logged in as " + response.json()["username"])
