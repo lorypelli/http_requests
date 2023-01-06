@@ -6,6 +6,9 @@ import config
 if (path.exists("./__pycache__")):
     rmtree("./__pycache__")
 PySimpleGUI.theme("BlueMono")
+logged_in_as = [
+    [PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as", key="logged_in_as")]
+]
 import_from_config = [
     [PySimpleGUI.Button("Import from config")]
 ]
@@ -27,7 +30,7 @@ list = [
     [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Delete a channel"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
 ]
 layout = [
-    [import_from_config, bot_token, channel_id, list, message, send_delete_btn]
+    [logged_in_as, import_from_config, bot_token, channel_id, list, message, send_delete_btn]
 ]
 window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial")
 while True:
@@ -35,26 +38,31 @@ while True:
     if (event == "Import from config"):
         response = get("https://discord.com/api/auth/login", headers = {
             "authorization": "Bot " + config.bot_token
-    })
+        })
         if (response.status_code == 200):
             window["tkn_textbox"].Update(config.bot_token)
         response = get("https://discord.com/api/channels/" + config.channel_id, headers = {
             "authorization": "Bot " + config.bot_token
-    })
+        })
         if (response.status_code == 200):
             window["chn_textbox"].Update(config.channel_id)
     if (event == "Validate"):
         response = get("https://discord.com/api/auth/login", headers = {
             "authorization": "Bot " + values["tkn_textbox"]
-    })
+        })
         if (response.status_code != 200 and event == "Validate"):
             PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+            window["logged_in_as"].Update("Logged in as")
         elif (response.status_code == 200 and event == "Validate"):
             PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
+            response = get("https://discord.com/api/v10/users/@me", headers = {
+                "authorization": "Bot " + values["tkn_textbox"]
+            })
+            window["logged_in_as"].Update("Logged in as " + response.json()["username"])
     elif (event == "Validate0"):
         response = get("https://discord.com/api/channels/" + values["chn_textbox"], headers = {
             "authorization": "Bot " + values["tkn_textbox"]
-    })
+        })
         if (response.status_code != 200 and event == "Validate0"):
             PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
         elif (response.status_code == 200 and event == "Validate0"):
