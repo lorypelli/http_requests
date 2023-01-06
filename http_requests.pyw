@@ -29,7 +29,7 @@ list = [
 layout = [
     [import_from_config, bot_token, channel_id, list, message, send_delete_btn]
 ]
-window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico")
+window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial")
 while True:
     event, values = window.read()
     if (event == "Import from config"):
