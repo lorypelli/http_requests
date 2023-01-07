@@ -2,9 +2,6 @@ import PySimpleGUI
 from requests import get, post, delete
 from shutil import rmtree
 from os import path
-import config
-if (path.exists("./__pycache__")):
-    rmtree("./__pycache__")
 PySimpleGUI.theme("BlueMono")
 def login():
     import_from_config = [
@@ -21,11 +18,17 @@ def login():
     while True:
         event, values = window.read()
         if (event == "Import from config"):
-            response = get("https://discord.com/api/auth/login", headers = {
-                "authorization": "Bot " + config.bot_token
-            })
-            if (response.status_code == 200):
-                window["tkn_textbox"].Update(config.bot_token)
+            try:
+                import config
+                if (path.exists("./__pycache__")):
+                    rmtree("./__pycache__")
+                response = get("https://discord.com/api/auth/login", headers = {
+                    "authorization": "Bot " + config.bot_token
+                })
+                if (response.status_code == 200):
+                    window["tkn_textbox"].Update(config.bot_token)
+            except ImportError:
+                PySimpleGUI.popup("The file config.py doesn't exists", no_titlebar=True)
         if (event == "Validate"):
             response = get("https://discord.com/api/auth/login", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
