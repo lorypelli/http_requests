@@ -7,7 +7,7 @@ if (path.exists("./__pycache__")):
     rmtree("./__pycache__")
 PySimpleGUI.theme("BlueMono")
 logged_in_as = [
-    [PySimpleGUI.Push(), PySimpleGUI.Text("To login, provide a valid bot token", key="logged_in_as")]
+    [PySimpleGUI.Text("To login, provide a valid bot token", key="logged_in_id"), PySimpleGUI.Push(), PySimpleGUI.Text("To login, provide a valid bot token", key="logged_in_as")]
 ]
 import_from_config = [
     [PySimpleGUI.Button("Import from config")]
@@ -53,12 +53,14 @@ while True:
         if (response.status_code != 200 and event == "Validate"):
             PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
             window["logged_in_as"].Update("To login, provide a valid bot token")
+            window["logged_in_id"].Update("To login, provide a valid bot token")
         elif (response.status_code == 200 and event == "Validate"):
             PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
             response = get("https://discord.com/api/users/@me", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
             })
             window["logged_in_as"].Update("Logged in as " + response.json()["username"])
+            window["logged_in_id"].Update("User ID " + response.json()["id"])
     elif (event == "Validate0"):
         response = get("https://discord.com/api/channels/" + values["chn_textbox"], headers = {
             "authorization": "Bot " + values["tkn_textbox"]
