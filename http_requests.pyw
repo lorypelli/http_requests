@@ -38,11 +38,20 @@ def login():
             elif (response.status_code == 200 and event == "Validate"):
                 PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
                 login.tkn_value = values["tkn_textbox"]
+                login.username = (get("https://discord.com/api/users/@me", headers = {
+                    "authorization": "Bot " + values["tkn_textbox"]
+                })).json()["username"]
+                login.id = (get("https://discord.com/api/users/@me", headers = {
+                    "authorization": "Bot " + values["tkn_textbox"]
+                })).json()["id"]
                 window.close()
                 program()
         elif (event == PySimpleGUI.WIN_CLOSED):
             break
 def program():
+    logged_user = [
+        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username)]
+    ]
     channel_id = [
         [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.InputText(size=(100), key="chn_textbox")],
         [PySimpleGUI.Button("Validate")]
@@ -57,7 +66,7 @@ def program():
         [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Delete a channel"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
     ]
     layout = [
-        [channel_id, list, message, send_delete_btn]
+        [logged_user, channel_id, list, message, send_delete_btn]
     ]
     window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial")
     while True:
