@@ -27,8 +27,8 @@ def login():
                 })
                 if (response.status_code == 200):
                     window["tkn_textbox"].Update(config.bot_token)
-            except ImportError:
-                PySimpleGUI.popup("The file config.py doesn't exists", no_titlebar=True)
+            except:
+                PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
         if (event == "Validate"):
             response = get("https://discord.com/api/auth/login", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
