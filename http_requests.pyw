@@ -50,7 +50,7 @@ def login():
             break
 def program():
     logged_user = [
-        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username)]
+        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username)]
     ]
     channel_id = [
         [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.InputText(size=(100), key="chn_textbox")],
@@ -79,6 +79,11 @@ def program():
                 PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
             elif (response.status_code == 200 and event == "Validate"):
                 PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
+        elif (event == "Logout"):
+            response = PySimpleGUI.popup_ok_cancel("Are you sure you want to logout", no_titlebar=True)
+            if (response == "OK"):
+                window.close()
+                login()
         elif (event == PySimpleGUI.WIN_CLOSED):
             break
         elif (values["selectbox"] == "Delete a channel"):
