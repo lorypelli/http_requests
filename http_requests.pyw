@@ -1,5 +1,5 @@
 import PySimpleGUI
-from requests import get, post, delete
+from requests import get, post, delete, patch
 from shutil import rmtree
 from os import path
 PySimpleGUI.theme("BlueMono")
@@ -62,16 +62,19 @@ def program():
         [PySimpleGUI.Text("Insert message", key="msg_text"), PySimpleGUI.Multiline(size=(100, 5), key="msg_textbox")]
     ]
     send_delete_btn = [
-        [PySimpleGUI.Button("Send", key="Send_Delete")]
+        [PySimpleGUI.Button("Send", key="Send_Delete_Edit")]
     ]
     list = [
-        [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Delete a channel", "Delete a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
+        [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Edit a message", "Edit a channel", "Delete a channel", "Delete a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
     ]
     message_id = [
         [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.InputText(size=(100), key="msg_id_textbox", visible=False)]
     ]
+    channel_name = [
+        [PySimpleGUI.Text("Insert channel name", key="chn_name_text", visible=False), PySimpleGUI.InputText(size=(100), key="chn_name_textbox", visible=False)]
+    ]
     layout = [
-        [logged_user, channel_id, list, message, message_id, send_delete_btn]
+        [logged_user, channel_id, list, channel_name, message, message_id, send_delete_btn]
     ]
     window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial")
     while True:
@@ -96,42 +99,62 @@ def program():
             window["msg_textbox"].Update(visible = False)
             window["msg_id_text"].Update(visible = False)
             window["msg_id_textbox"].Update(visible = False)
-            window["Send_Delete"].Update("Delete") 
+            window["chn_name_text"].Update(visible = False)
+            window["chn_name_textbox"].Update(visible = False)
+            window["Send_Delete_Edit"].Update("Delete")
         elif (values["selectbox"] == "Delete a message"):
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
             window["msg_id_text"].Update(visible = True)
             window["msg_id_textbox"].Update(visible = True)
-            window["Send_Delete"].Update("Delete") 
+            window["msg_text"].Update(visible = False)
+            window["msg_textbox"].Update(visible = False)
+            window["chn_name_text"].Update(visible = False)
+            window["chn_name_textbox"].Update(visible = False)
+            window["Send_Delete_Edit"].Update("Delete")
+        elif (values["selectbox"] == "Edit a message"):
+            window["msg_id_text"].Update(visible = True)
+            window["msg_id_textbox"].Update(visible = True)
+            window["chn_name_text"].Update(visible = False)
+            window["chn_name_textbox"].Update(visible = False)
+            window["Send_Delete_Edit"].Update("Edit")
+        elif (values["selectbox"] == "Edit a channel"):
+            window["chn_name_text"].Update(visible = True)
+            window["chn_name_textbox"].Update(visible = True)
+            window["msg_text"].Update(visible = False)
+            window["msg_textbox"].Update(visible = False)
+            window["msg_id_text"].Update(visible = False)
+            window["msg_id_textbox"].Update(visible = False)
+            window["Send_Delete_Edit"].Update("Edit")
         else:
             window["msg_text"].Update(visible = True)
             window["msg_textbox"].Update(visible = True)
             window["msg_id_text"].Update(visible = False)
             window["msg_id_textbox"].Update(visible = False)
-            window["Send_Delete"].Update("Send")
-        if (values["selectbox"] != "Delete a channel" and values["selectbox"] != "Delete a message"):
+            window["chn_name_text"].Update(visible = False)
+            window["chn_name_textbox"].Update(visible = False)
+            window["Send_Delete_Edit"].Update("Send")
+        if (values["selectbox"] != "Delete a channel" and values["selectbox"] != "Delete a message" and values["selectbox"] != "Edit a message" and values["selectbox"] != "Edit a channel"):
             def post_msg(msg: str):
                 response = post("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages", headers = {
                     "authorization": "Bot " + login.tkn_value
-                }, data = {
+                }, json = {
                     "content": msg
                 })
-                if (response.status_code != 200 and event == "Send_Delete"):
+                if (response.status_code != 200 and event == "Send_Delete_Edit"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 200 and event == "Send_Delete"):
+                elif (response.status_code == 200 and event == "Send_Delete_Edit"):
                     PySimpleGUI.popup("The message has been sent successfully!", no_titlebar=True)
-            if (event == "Send_Delete"):
+            if (event == "Send_Delete_Edit"):
                 post_msg(values["msg_textbox"])
         elif (values["selectbox"] == "Delete a channel"):
             def delete_chn(chn_id: str):
                 response = delete("https://discord.com/api/channels/" + chn_id, headers = {
                     "authorization": "Bot " + login.tkn_value
                 })
-                if (response.status_code != 200 and event == "Send_Delete"):
+                if (response.status_code != 200 and event == "Send_Delete_Edit"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 200 and event == "Send_Delete"):
+                elif (response.status_code == 200 and event == "Send_Delete_Edit"):
                     PySimpleGUI.popup("The channel has been deleted successfully!", no_titlebar=True)
-            if (event == "Send_Delete"):
+            if (event == "Send_Delete_Edit"):
                 delete_chn(values["chn_textbox"])
         elif (values["selectbox"] == "Delete a message"):
             def delete_msg(msg_id: str):
@@ -142,7 +165,33 @@ def program():
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
                 elif (response.status_code == 204 and event == "Send_Delete"):
                     PySimpleGUI.popup("The message has been deleted successfully!", no_titlebar=True)
-            if (event == "Send_Delete"):
+            if (event == "Send_Delete_Edit"):
                 delete_msg(values["msg_id_textbox"])
+        elif (values["selectbox"] == "Edit a message"):
+            def edit_msg(msg_id: str, msg: str):
+                response = patch("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages/" + msg_id, headers = {
+                    "authorization": "Bot " + login.tkn_value
+                }, json = {
+                    "content": msg
+                })
+                if (response.status_code != 200 and event == "Send_Delete_Edit"):
+                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                elif (response.status_code == 200 and event == "Send_Delete_Edit"):
+                    PySimpleGUI.popup("The message has been edited successfully!", no_titlebar=True)
+            if (event == "Send_Delete_Edit"):
+                edit_msg(values["msg_id_textbox"], values["msg_textbox"])
+        elif (values["selectbox"] == "Edit a channel"):
+            def edit_chn(chn_id: str, chn_name: str):
+                response = patch("https://discord.com/api/channels/" + chn_id, headers = {
+                    "authorization": "Bot " + login.tkn_value
+                }, json = {
+                    "name": chn_name
+                })
+                if (response.status_code != 200 and event == "Send_Delete_Edit"):
+                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                elif (response.status_code == 200 and event == "Send_Delete_Edit"):
+                    PySimpleGUI.popup("The channel has been edited successfully!", no_titlebar=True)
+            if (event == "Send_Delete_Edit"):
+                edit_chn(values["chn_textbox"], values["chn_name_textbox"])
 if (__name__ == "__main__"):
     login()
