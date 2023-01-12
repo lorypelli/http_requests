@@ -161,9 +161,9 @@ def program():
                 response = delete("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages/" + msg_id, headers = {
                     "authorization": "Bot " + login.tkn_value
                 })
-                if (response.status_code != 204 and event == "Send_Delete"):
+                if (response.status_code != 204 and event == "Send_Delete_Edit"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 204 and event == "Send_Delete"):
+                elif (response.status_code == 204 and event == "Send_Delete_Edit"):
                     PySimpleGUI.popup("The message has been deleted successfully!", no_titlebar=True)
             if (event == "Send_Delete_Edit"):
                 delete_msg(values["msg_id_textbox"])
