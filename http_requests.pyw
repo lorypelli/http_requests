@@ -14,7 +14,7 @@ def login():
     layout = [
         [import_from_config, bot_token]
     ]
-    window = PySimpleGUI.Window("Login", layout, element_justification="c", icon="./app_icon.ico", font="Arial")
+    window = PySimpleGUI.Window("Login", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(850, 110))
     while True:
         event, values = window.read()
         if (event == "Import from config"):
@@ -80,7 +80,7 @@ def program():
     layout = [
         [logged_user, channel_id, list, channel_name, message, message_id, thread_name, send_delete_edit_create_btn]
     ]
-    window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial")
+    window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(1130, 420))
     while True:
         event, values = window.read()
         if (event == "Validate"):
