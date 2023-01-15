@@ -132,6 +132,8 @@ def program():
             window["msg_id_text"].Update(visible = True)
             window["msg_id_textbox"].Update(visible = True)
             window["msg_id_btn"].Update(visible = True)
+            window["msg_text"].Update(visible = True)
+            window["msg_textbox"].Update(visible = True)
             window["chn_name_text"].Update(visible = False)
             window["chn_name_textbox"].Update(visible = False)
             window["thread_name_text"].Update(visible = False)
