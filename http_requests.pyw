@@ -1,5 +1,5 @@
 import PySimpleGUI
-from requests import get, post, delete, patch
+from requests import get, post, delete, patch, put
 from shutil import rmtree
 from os import path
 PySimpleGUI.theme("BlueMono")
@@ -61,11 +61,11 @@ def program():
     message = [
         [PySimpleGUI.Text("Insert message", key="msg_text"), PySimpleGUI.Multiline(size=(100, 5), key="msg_textbox")]
     ]
-    send_delete_edit_create_btn = [
-        [PySimpleGUI.Button("Send", key="Send_Delete_Edit_Create")]
+    confirm_action_btn = [
+        [PySimpleGUI.Button("Send", key="confirm_action_btn")]
     ]
     list = [
-        [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Edit a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
+        [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
     ]
     message_id = [
         [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.InputText(size=(100), key="msg_id_textbox", visible=False)],
@@ -78,7 +78,7 @@ def program():
         [PySimpleGUI.Text("Insert thread name", key="thread_name_text", visible=False), PySimpleGUI.InputText(size=(100), key="thread_name_textbox", visible=False)]
     ]
     layout = [
-        [logged_user, channel_id, list, channel_name, message, message_id, thread_name, send_delete_edit_create_btn]
+        [logged_user, channel_id, list, channel_name, message, message_id, thread_name, confirm_action_btn]
     ]
     window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(1130, 420))
     while True:
@@ -116,7 +116,7 @@ def program():
             window["chn_name_textbox"].Update(visible = False)
             window["thread_name_text"].Update(visible = False)
             window["thread_name_textbox"].Update(visible = False)
-            window["Send_Delete_Edit_Create"].Update("Delete")
+            window["confirm_action_btn"].Update("Delete")
         elif (values["selectbox"] == "Delete a message"):
             window["msg_id_text"].Update(visible = True)
             window["msg_id_textbox"].Update(visible = True)
@@ -127,7 +127,7 @@ def program():
             window["chn_name_textbox"].Update(visible = False)
             window["thread_name_text"].Update(visible = False)
             window["thread_name_textbox"].Update(visible = False)
-            window["Send_Delete_Edit_Create"].Update("Delete")
+            window["confirm_action_btn"].Update("Delete")
         elif (values["selectbox"] == "Edit a message"):
             window["msg_id_text"].Update(visible = True)
             window["msg_id_textbox"].Update(visible = True)
@@ -136,7 +136,7 @@ def program():
             window["chn_name_textbox"].Update(visible = False)
             window["thread_name_text"].Update(visible = False)
             window["thread_name_textbox"].Update(visible = False)
-            window["Send_Delete_Edit_Create"].Update("Edit")
+            window["confirm_action_btn"].Update("Edit")
         elif (values["selectbox"] == "Edit a channel"):
             window["chn_name_text"].Update(visible = True)
             window["chn_name_textbox"].Update(visible = True)
@@ -147,7 +147,7 @@ def program():
             window["msg_id_textbox"].Update(visible = False)
             window["thread_name_text"].Update(visible = False)
             window["thread_name_textbox"].Update(visible = False)
-            window["Send_Delete_Edit_Create"].Update("Edit")
+            window["confirm_action_btn"].Update("Edit")
         elif (values["selectbox"] == "Create a thread"):
             window["thread_name_text"].Update(visible = True)
             window["thread_name_textbox"].Update(visible = True)
@@ -158,7 +158,29 @@ def program():
             window["msg_textbox"].Update(visible = False)
             window["chn_name_text"].Update(visible = False)
             window["chn_name_textbox"].Update(visible = False)
-            window["Send_Delete_Edit_Create"].Update("Create")
+            window["confirm_action_btn"].Update("Create")
+        elif (values["selectbox"] == "Pin a message"):
+            window["msg_id_text"].Update(visible = True)
+            window["msg_id_textbox"].Update(visible = True)
+            window["msg_id_btn"].Update(visible = True)
+            window["msg_text"].Update(visible = False)
+            window["msg_textbox"].Update(visible = False)
+            window["chn_name_text"].Update(visible = False)
+            window["chn_name_textbox"].Update(visible = False)
+            window["thread_name_text"].Update(visible = False)
+            window["thread_name_textbox"].Update(visible = False)
+            window["confirm_action_btn"].Update("Pin")
+        elif (values["selectbox"] == "Unpin a message"):
+            window["msg_id_text"].Update(visible = True)
+            window["msg_id_textbox"].Update(visible = True)
+            window["msg_id_btn"].Update(visible = True)
+            window["msg_text"].Update(visible = False)
+            window["msg_textbox"].Update(visible = False)
+            window["chn_name_text"].Update(visible = False)
+            window["chn_name_textbox"].Update(visible = False)
+            window["thread_name_text"].Update(visible = False)
+            window["thread_name_textbox"].Update(visible = False)
+            window["confirm_action_btn"].Update("Unpin")
         else:
             window["msg_text"].Update(visible = True)
             window["msg_textbox"].Update(visible = True)
@@ -169,41 +191,41 @@ def program():
             window["chn_name_textbox"].Update(visible = False)
             window["thread_name_text"].Update(visible = False)
             window["thread_name_textbox"].Update(visible = False)
-            window["Send_Delete_Edit_Create"].Update("Send")
-        if (values["selectbox"] != "Delete a channel" and values["selectbox"] != "Delete a message" and values["selectbox"] != "Edit a message" and values["selectbox"] != "Edit a channel" and values["selectbox"] != "Create a thread"):
+            window["confirm_action_btn"].Update("Send")
+        if (values["selectbox"] != "Delete a channel" and values["selectbox"] != "Delete a message" and values["selectbox"] != "Edit a message" and values["selectbox"] != "Edit a channel" and values["selectbox"] != "Create a thread" and values["selectbox"] != "Pin a message" and values["selectbox"] != "Unpin a message"):
             def post_msg(msg: str):
                 response = post("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages", headers = {
                     "authorization": "Bot " + login.tkn_value
                 }, json = {
                     "content": msg
                 })
-                if (response.status_code != 200 and event == "Send_Delete_Edit_Create"):
+                if (response.status_code != 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 200 and event == "Send_Delete_Edit_Create"):
+                elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been sent successfully!", no_titlebar=True)
-            if (event == "Send_Delete_Edit_Create"):
+            if (event == "confirm_action_btn"):
                 post_msg(values["msg_textbox"])
         elif (values["selectbox"] == "Delete a channel"):
             def delete_chn(chn_id: str):
                 response = delete("https://discord.com/api/channels/" + chn_id, headers = {
                     "authorization": "Bot " + login.tkn_value
                 })
-                if (response.status_code != 200 and event == "Send_Delete_Edit_Create"):
+                if (response.status_code != 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 200 and event == "Send_Delete_Edit_Create"):
+                elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The channel has been deleted successfully!", no_titlebar=True)
-            if (event == "Send_Delete_Edit_Create"):
+            if (event == "confirm_action_btn"):
                 delete_chn(values["chn_textbox"])
         elif (values["selectbox"] == "Delete a message"):
             def delete_msg(msg_id: str):
                 response = delete("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages/" + msg_id, headers = {
                     "authorization": "Bot " + login.tkn_value
                 })
-                if (response.status_code != 204 and event == "Send_Delete_Edit_Create"):
+                if (response.status_code != 204 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 204 and event == "Send_Delete_Edit_Create"):
+                elif (response.status_code == 204 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been deleted successfully!", no_titlebar=True)
-            if (event == "Send_Delete_Edit_Create"):
+            if (event == "confirm_action_btn"):
                 delete_msg(values["msg_id_textbox"])
         elif (values["selectbox"] == "Edit a message"):
             def edit_msg(msg_id: str, msg: str):
@@ -212,11 +234,11 @@ def program():
                 }, json = {
                     "content": msg
                 })
-                if (response.status_code != 200 and event == "Send_Delete_Edit_Create"):
+                if (response.status_code != 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 200 and event == "Send_Delete_Edit_Create"):
+                elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been edited successfully!", no_titlebar=True)
-            if (event == "Send_Delete_Edit_Create"):
+            if (event == "confirm_action_btn"):
                 edit_msg(values["msg_id_textbox"], values["msg_textbox"])
         elif (values["selectbox"] == "Edit a channel"):
             def edit_chn(chn_id: str, chn_name: str):
@@ -225,11 +247,11 @@ def program():
                 }, json = {
                     "name": chn_name
                 })
-                if (response.status_code != 200 and event == "Send_Delete_Edit_Create"):
+                if (response.status_code != 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 200 and event == "Send_Delete_Edit_Create"):
+                elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The channel has been edited successfully!", no_titlebar=True)
-            if (event == "Send_Delete_Edit_Create"):
+            if (event == "confirm_action_btn"):
                 edit_chn(values["chn_textbox"], values["chn_name_textbox"])
         elif (values["selectbox"] == "Create a thread"):
             def create_thread(chn_id: str, msg_id: str, thread_name: str):
@@ -238,12 +260,34 @@ def program():
                 }, json = {
                     "name": thread_name
                 })
-                if (response.status_code != 201 and event == "Send_Delete_Edit_Create"):
+                if (response.status_code != 201 and event == "confirm_action_btn"):
                     print(response.status_code)
                     PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                elif (response.status_code == 201 and event == "Send_Delete_Edit_Create"):
+                elif (response.status_code == 201 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The thread has been created successfully!", no_titlebar=True)
-            if (event == "Send_Delete_Edit_Create"):
+            if (event == "confirm_action_btn"):
                 create_thread(values["chn_textbox"], values["msg_id_textbox"], values["thread_name_textbox"])
+        elif (values["selectbox"] == "Pin a message"):
+            def pin_msg(msg_id: str):
+                response = put("https://discord.com/api/channels/" + values["chn_textbox"] + "/pins/" + msg_id, headers = {
+                    "authorization": "Bot " + login.tkn_value
+                })
+                if (response.status_code != 204 and event == "confirm_action_btn"):
+                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                elif (response.status_code == 204 and event == "confirm_action_btn"):
+                    PySimpleGUI.popup("The message has been pinned successfully!", no_titlebar=True)
+            if (event == "confirm_action_btn"):
+                pin_msg(values["msg_id_textbox"])
+        elif (values["selectbox"] == "Unpin a message"):
+            def unpin_msg(msg_id: str):
+                response = delete("https://discord.com/api/channels/" + values["chn_textbox"] + "/pins/" + msg_id, headers = {
+                    "authorization": "Bot " + login.tkn_value
+                })
+                if (response.status_code != 204 and event == "confirm_action_btn"):
+                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                elif (response.status_code == 204 and event == "confirm_action_btn"):
+                    PySimpleGUI.popup("The message has been unpinned successfully!", no_titlebar=True)
+            if (event == "confirm_action_btn"):
+                unpin_msg(values["msg_id_textbox"])
 if (__name__ == "__main__"):
     login()
