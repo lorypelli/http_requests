@@ -2,7 +2,6 @@ import PySimpleGUI
 from requests import get, post, delete, patch, put
 from shutil import rmtree
 from os import path
-from pathlib import Path
 PySimpleGUI.theme("BlueMono")
 def login():
     import_from_config = [
