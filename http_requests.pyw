@@ -2,6 +2,7 @@ import PySimpleGUI
 from requests import get, post, delete, patch, put
 from shutil import rmtree
 from os import path
+from pathlib import Path
 PySimpleGUI.theme("BlueMono")
 def login():
     import_from_config = [
@@ -18,19 +19,23 @@ def login():
     while True:
         event, values = window.read()
         if (event == "Import from config"):
-            try:
-                import config
-                if (path.exists("./__pycache__")):
-                    rmtree("./__pycache__")
-                response = get("https://discord.com/api/auth/login", headers = {
-                    "authorization": "Bot " + config.bot_token
-                })
-                if (response.status_code == 200 and event == "Import from config"):
-                    window["tkn_textbox"].Update(config.bot_token)
-                elif (response.status_code != 200 and event == "Import from config"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-            except:
-                PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
+            if (Path("./http_requests.pyw").suffix == ".pyw" or Path("./http_requests.pyw").suffix == ".py"):
+                try:
+                    from config import config
+                    configtkn = config()
+                    if (path.exists("./__pycache__")):
+                        rmtree("./__pycache__")
+                    response = get("https://discord.com/api/auth/login", headers = {
+                        "authorization": "Bot " + configtkn
+                    })
+                    if (response.status_code == 200 and event == "Import from config"):
+                        window["tkn_textbox"].Update(configtkn)
+                    elif (response.status_code != 200 and event == "Import from config"):
+                        PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                except:
+                    PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
+            else:
+                PySimpleGUI.popup("This is not supported with executable files", no_titlebar=True)
         if (event == "Validate"):
             response = get("https://discord.com/api/auth/login", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
