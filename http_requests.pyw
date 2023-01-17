@@ -2,6 +2,7 @@ import PySimpleGUI
 from requests import get, post, delete, patch, put
 from shutil import rmtree
 from os import path
+from importlib import reload
 PySimpleGUI.theme("BlueMono")
 def login():
     import_from_config = [
@@ -19,8 +20,9 @@ def login():
         event, values = window.read()
         if (event == "Import from config"):
             try:
-                from config import config
-                configtkn = config()
+                import config
+                reload(config)
+                configtkn = config.config()
                 if (path.exists("./__pycache__")):
                     rmtree("./__pycache__")
                 response = get("https://discord.com/api/auth/login", headers = {
