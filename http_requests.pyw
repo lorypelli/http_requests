@@ -10,7 +10,7 @@ def login():
         [PySimpleGUI.Button("Import from config")]
     ]
     bot_token = [
-        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.InputText(size=(100), key="tkn_textbox")],
+        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(size=(100), key="tkn_textbox")],
         [PySimpleGUI.Button("Validate")]
     ]
     layout = [
@@ -64,7 +64,7 @@ def program():
         [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username)]
     ]
     channel_id = [
-        [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.InputText(size=(100), key="chn_textbox")],
+        [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.Input(size=(100), key="chn_textbox")],
         [PySimpleGUI.Button("Validate")]
     ]
     message = [
@@ -77,14 +77,14 @@ def program():
         [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
     ]
     message_id = [
-        [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.InputText(size=(100), key="msg_id_textbox", visible=False)],
+        [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.Input(size=(100), key="msg_id_textbox", visible=False)],
         [PySimpleGUI.Button("Validate", visible=False, key="msg_id_btn")]
     ]
     channel_name = [
-        [PySimpleGUI.Text("Insert channel name", key="chn_name_text", visible=False), PySimpleGUI.InputText(size=(100), key="chn_name_textbox", visible=False)]
+        [PySimpleGUI.Text("Insert channel name", key="chn_name_text", visible=False), PySimpleGUI.Input(size=(100), key="chn_name_textbox", visible=False)]
     ]
     thread_name = [
-        [PySimpleGUI.Text("Insert thread name", key="thread_name_text", visible=False), PySimpleGUI.InputText(size=(100), key="thread_name_textbox", visible=False)]
+        [PySimpleGUI.Text("Insert thread name", key="thread_name_text", visible=False), PySimpleGUI.Input(size=(100), key="thread_name_textbox", visible=False)]
     ]
     layout = [
         [logged_user, channel_id, list, channel_name, message, message_id, thread_name, confirm_action_btn]
