@@ -3,6 +3,7 @@ from requests import get, post, delete, patch, put
 from shutil import rmtree
 from os import path
 from importlib import reload
+from psutil import process_iter
 PySimpleGUI.theme("BlueMono")
 def login():
     import_from_config = [
@@ -19,21 +20,26 @@ def login():
     while True:
         event, values = window.read()
         if (event == "Import from config"):
-            try:
-                import config
-                reload(config)
-                configtkn = config.config()
-                if (path.exists("./__pycache__")):
-                    rmtree("./__pycache__")
-                response = get("https://discord.com/api/auth/login", headers = {
-                    "authorization": "Bot " + configtkn
-                })
-                if (response.status_code == 200 and event == "Import from config"):
-                    window["tkn_textbox"].Update(configtkn)
-                elif (response.status_code != 200 and event == "Import from config"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-            except:
-                PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
+            for process in process_iter():
+                if (process.name() == "http_requests.exe"):
+                    PySimpleGUI.popup("This doesn't work with executable files", no_titlebar=True)
+                    break
+            else:
+                try:
+                    import config
+                    reload(config)
+                    configtkn = config.config()
+                    if (path.exists("./__pycache__")):
+                        rmtree("./__pycache__")
+                    response = get("https://discord.com/api/auth/login", headers = {
+                        "authorization": "Bot " + configtkn
+                    })
+                    if (response.status_code == 200 and event == "Import from config"):
+                        window["tkn_textbox"].Update(configtkn)
+                    elif (response.status_code != 200 and event == "Import from config"):
+                        PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                except:
+                    PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
         if (event == "Validate"):
             response = get("https://discord.com/api/auth/login", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
