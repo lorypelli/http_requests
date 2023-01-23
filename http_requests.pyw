@@ -10,7 +10,7 @@ def login():
         [PySimpleGUI.Button("Import from config")]
     ]
     bot_token = [
-        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(size=(100), key="tkn_textbox")],
+        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(size=(100), key="tkn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
         [PySimpleGUI.Button("Validate")]
     ]
     layout = [
@@ -64,11 +64,11 @@ def program():
         [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username)]
     ]
     channel_id = [
-        [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.Input(size=(100), key="chn_textbox")],
+        [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.Input(size=(100), key="chn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
         [PySimpleGUI.Button("Validate")]
     ]
     message = [
-        [PySimpleGUI.Text("Insert message", key="msg_text"), PySimpleGUI.Multiline(size=(100, 5), key="msg_textbox")]
+        [PySimpleGUI.Text("Insert message", key="msg_text"), PySimpleGUI.Multiline(size=(100, 5), key="msg_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")]
     ]
     confirm_action_btn = [
         [PySimpleGUI.Button("Send", key="confirm_action_btn")]
@@ -77,14 +77,14 @@ def program():
         [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
     ]
     message_id = [
-        [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.Input(size=(100), key="msg_id_textbox", visible=False)],
+        [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.Input(size=(100), key="msg_id_textbox", visible=False, selected_background_color="#B0B4D4", selected_text_color="#000000")],
         [PySimpleGUI.Button("Validate", visible=False, key="msg_id_btn")]
     ]
     channel_name = [
-        [PySimpleGUI.Text("Insert channel name", key="chn_name_text", visible=False), PySimpleGUI.Input(size=(100), key="chn_name_textbox", visible=False)]
+        [PySimpleGUI.Text("Insert channel name", key="chn_name_text", visible=False), PySimpleGUI.Input(size=(100), key="chn_name_textbox", visible=False, selected_background_color="#B0B4D4", selected_text_color="#000000")]
     ]
     thread_name = [
-        [PySimpleGUI.Text("Insert thread name", key="thread_name_text", visible=False), PySimpleGUI.Input(size=(100), key="thread_name_textbox", visible=False)]
+        [PySimpleGUI.Text("Insert thread name", key="thread_name_text", visible=False), PySimpleGUI.Input(size=(100), key="thread_name_textbox", visible=False, selected_background_color="#B0B4D4", selected_text_color="#000000")]
     ]
     layout = [
         [logged_user, channel_id, list, channel_name, message, message_id, thread_name, confirm_action_btn]
