@@ -97,7 +97,7 @@ def program():
                 "authorization": "Bot " + login.tkn_value
             })
             if (response.status_code != 200 and event == "Validate"):
-                PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
             elif (response.status_code == 200 and event == "Validate"):
                 PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
         elif (event == "msg_id_btn"):
@@ -105,7 +105,7 @@ def program():
                 "authorization": "Bot " + login.tkn_value
             })
             if (response.status_code != 200 and event == "msg_id_btn"):
-                PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
             elif (response.status_code == 200 and event == "msg_id_btn"):
                 PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
         elif (event == "Logout"):
@@ -211,7 +211,7 @@ def program():
                     "content": msg
                 })
                 if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been sent successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -222,7 +222,7 @@ def program():
                     "authorization": "Bot " + login.tkn_value
                 })
                 if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The channel has been deleted successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -233,7 +233,7 @@ def program():
                     "authorization": "Bot " + login.tkn_value
                 })
                 if (response.status_code != 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 204 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been deleted successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -246,7 +246,7 @@ def program():
                     "content": msg
                 })
                 if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been edited successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -259,7 +259,7 @@ def program():
                     "name": chn_name
                 })
                 if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 200 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The channel has been edited successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -272,8 +272,7 @@ def program():
                     "name": thread_name
                 })
                 if (response.status_code != 201 and event == "confirm_action_btn"):
-                    print(response.status_code)
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 201 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The thread has been created successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -284,7 +283,7 @@ def program():
                     "authorization": "Bot " + login.tkn_value
                 })
                 if (response.status_code != 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 204 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been pinned successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
@@ -295,7 +294,7 @@ def program():
                     "authorization": "Bot " + login.tkn_value
                 })
                 if (response.status_code != 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
                 elif (response.status_code == 204 and event == "confirm_action_btn"):
                     PySimpleGUI.popup("The message has been unpinned successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
