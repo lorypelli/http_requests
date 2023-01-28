@@ -34,10 +34,10 @@ def login():
                     response = get("https://discord.com/api/auth/login", headers = {
                         "authorization": "Bot " + configtkn
                     })
-                    if (response.status_code == 200 and event == "Import from config"):
-                        window["tkn_textbox"].Update(configtkn)
-                    elif (response.status_code != 200 and event == "Import from config"):
+                    if (response.status_code != 200 and event == "Import from config"):
                         PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
+                    elif (response.status_code == 200 and event == "Import from config"):
+                        window["tkn_textbox"].Update(configtkn)
                 except:
                     PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
         if (event == "Validate"):
