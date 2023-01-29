@@ -61,7 +61,7 @@ def login():
             break
 def program():
     logged_user = [
-        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username)]
+        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Button("Change Bot Username"), PySimpleGUI.Text("Logged in as " + login.username, key="username")]
     ]
     channel_id = [
         [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.Input(size=(100), key="chn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
@@ -113,6 +113,8 @@ def program():
             if (response == "OK"):
                 window.close()
                 login()
+        elif (event == "Change Bot Username"):
+            window["username"].Update(changeUsername())
         elif (event == PySimpleGUI.WIN_CLOSED):
             break
         elif (values["selectbox"] == "Delete a channel"):
@@ -299,5 +301,27 @@ def program():
                     PySimpleGUI.popup("The message has been unpinned successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
                 unpin_msg(values["msg_id_textbox"])
+def changeUsername():
+    layout = [
+        [PySimpleGUI.Text("Insert bot username"), PySimpleGUI.Input(size=(100), key="username_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
+        [PySimpleGUI.Button("Change")]
+    ]
+    window = PySimpleGUI.Window("Change Bot Username", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(320, 75))
+    while True:
+        event, values = window.read()
+        if (event == "Change"):
+            response = patch("https://discord.com/api/users/@me", headers = {
+                "authorization": "Bot " + login.tkn_value
+            }, json = {
+                "username": values["username_textbox"]
+            })
+            if (response.status_code != 200 and event == "Change"):
+                PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
+            elif (response.status_code == 200 and event == "Change"):
+                PySimpleGUI.popup("The bot username has been changed successfully!", no_titlebar=True)
+                window.close()
+                return values["username_textbox"]
+        elif (event == PySimpleGUI.WIN_CLOSED):
+            break
 if (__name__ == "__main__"):
     login()
