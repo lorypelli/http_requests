@@ -4,13 +4,14 @@ from shutil import rmtree
 from os import path
 from importlib import reload
 from psutil import process_iter
+from sys import exit
 PySimpleGUI.theme("BlueMono")
-def login():
+def login(tkn: str = ""):
     import_from_config = [
         [PySimpleGUI.Button("Import from config")]
     ]
     bot_token = [
-        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(size=(100), key="tkn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
+        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(tkn, size=(100), key="tkn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
         [PySimpleGUI.Button("Validate")]
     ]
     layout = [
@@ -109,10 +110,10 @@ def program():
             elif (response.status_code == 200 and event == "msg_id_btn"):
                 PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
         elif (event == "Logout"):
-            response = PySimpleGUI.popup_ok_cancel("Are you sure you want to logout", no_titlebar=True)
+            response = PySimpleGUI.popup_ok_cancel("Are you sure you want to logout?", no_titlebar=True)
             if (response == "OK"):
                 window.close()
-                login()
+                login(login.tkn_value)
         elif (event == "Change Bot Username"):
             window["username"].Update(changeUsername())
         elif (event == PySimpleGUI.WIN_CLOSED):
