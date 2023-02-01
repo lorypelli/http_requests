@@ -4,7 +4,6 @@ from shutil import rmtree
 from os import path
 from importlib import reload
 from psutil import process_iter
-from sys import exit
 PySimpleGUI.theme("BlueMono")
 def login(tkn: str = ""):
     import_from_config = [
