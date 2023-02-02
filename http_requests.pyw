@@ -4,7 +4,11 @@ from shutil import rmtree
 from os import path
 from importlib import reload
 from psutil import process_iter
+from webbrowser import open
 PySimpleGUI.theme("BlueMono")
+user_version = "SeventhRelease"
+is_alpha = False
+github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
 def login(tkn: str = ""):
     import_from_config = [
         [PySimpleGUI.Button("Import from config")]
@@ -18,6 +22,10 @@ def login(tkn: str = ""):
     ]
     window = PySimpleGUI.Window("Login", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(850, 110))
     while True:
+        if (user_version != github_version and is_alpha == False):
+            response = PySimpleGUI.popup("A new version is avaible, please update!", no_titlebar=True)
+            open("https://github.com/LoryPelli/http_requests/releases/latest")
+            window.close()
         event, values = window.read()
         if (event == "Import from config"):
             for process in process_iter():
