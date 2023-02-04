@@ -1,53 +1,22 @@
 import PySimpleGUI
 from requests import get, post, delete, patch, put
-from shutil import rmtree
-from os import path
-from importlib import reload
-from psutil import process_iter
 from webbrowser import open
 PySimpleGUI.theme("BlueMono")
 user_version = "SeventhRelease"
 is_alpha = False
 github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
 def login(tkn: str = ""):
-    import_from_config = [
-        [PySimpleGUI.Button("Import from config")]
-    ]
     bot_token = [
         [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(tkn, size=(100), key="tkn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
         [PySimpleGUI.Button("Validate")]
     ]
-    layout = [
-        [import_from_config, bot_token]
-    ]
-    window = PySimpleGUI.Window("Login", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(850, 110))
+    window = PySimpleGUI.Window("Login", bot_token, element_justification="c", icon="./app_icon.ico", font="Arial", size=(850, 75))
     while True:
         if (user_version != github_version and is_alpha == False):
             response = PySimpleGUI.popup("A new version is avaible, please update!", no_titlebar=True)
             open("https://github.com/LoryPelli/http_requests/releases/latest")
             window.close()
         event, values = window.read()
-        if (event == "Import from config"):
-            for process in process_iter():
-                if (process.name() == "http_requests.exe"):
-                    PySimpleGUI.popup("This doesn't work with executable files", no_titlebar=True)
-                    break
-            else:
-                try:
-                    import config
-                    reload(config)
-                    configtkn = config.config()
-                    if (path.exists("./__pycache__")):
-                        rmtree("./__pycache__")
-                    response = get("https://discord.com/api/auth/login", headers = {
-                        "authorization": "Bot " + configtkn
-                    })
-                    if (response.status_code != 200 and event == "Import from config"):
-                        PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-                    elif (response.status_code == 200 and event == "Import from config"):
-                        window["tkn_textbox"].Update(configtkn)
-                except:
-                    PySimpleGUI.popup("The file config.py doesn't exists or is not configured as it should be", no_titlebar=True)
         if (event == "Validate"):
             response = get("https://discord.com/api/auth/login", headers = {
                 "authorization": "Bot " + values["tkn_textbox"]
@@ -69,7 +38,7 @@ def login(tkn: str = ""):
             break
 def program():
     logged_user = [
-        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Button("Change Bot Username"), PySimpleGUI.Text("Logged in as " + login.username, key="username")]
+        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username, key="username")]
     ]
     channel_id = [
         [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.Input(size=(100), key="chn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
@@ -121,8 +90,6 @@ def program():
             if (response == "OK"):
                 window.close()
                 login(login.tkn_value)
-        elif (event == "Change Bot Username"):
-            window["username"].Update(changeUsername())
         elif (event == PySimpleGUI.WIN_CLOSED):
             break
         elif (values["selectbox"] == "Delete a channel"):
@@ -309,27 +276,5 @@ def program():
                     PySimpleGUI.popup("The message has been unpinned successfully!", no_titlebar=True)
             if (event == "confirm_action_btn"):
                 unpin_msg(values["msg_id_textbox"])
-def changeUsername():
-    layout = [
-        [PySimpleGUI.Text("Insert bot username"), PySimpleGUI.Input(size=(100), key="username_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
-        [PySimpleGUI.Button("Change")]
-    ]
-    window = PySimpleGUI.Window("Change Bot Username", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(320, 75))
-    while True:
-        event, values = window.read()
-        if (event == "Change"):
-            response = patch("https://discord.com/api/users/@me", headers = {
-                "authorization": "Bot " + login.tkn_value
-            }, json = {
-                "username": values["username_textbox"]
-            })
-            if (response.status_code != 200 and event == "Change"):
-                PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-            elif (response.status_code == 200 and event == "Change"):
-                PySimpleGUI.popup("The bot username has been changed successfully!", no_titlebar=True)
-                window.close()
-                return values["username_textbox"]
-        elif (event == PySimpleGUI.WIN_CLOSED):
-            break
 if (__name__ == "__main__"):
     login()
