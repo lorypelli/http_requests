@@ -41,9 +41,22 @@ def program():
     app.resizable(False, False)
     app.geometry("1130x420+450+450")
     app.wm_iconbitmap("app_icon.ico")
+    def chnidbtn():
+        response = get("https://discord.com/api/auth/login", headers = {
+            "authorization": f"Bot {login.tkn_value}"
+        })
+        if (response.status_code != 200):
+            tkinter.messagebox.showerror("Error", "There was an error, try again!")
+        elif (response.status_code == 200):
+            tkinter.messagebox.showinfo("Success", "Validation Passed!")
     customtkinter.CTkLabel(app, text=f"User ID {login.id}", font=("Arial", 16)).place(relx=0.01, rely=0)
     username = customtkinter.CTkLabel(app, text=f"Logged in as {login.username}", font=("Arial", 16))
     username.place(relx=0.84, rely=0)
+    customtkinter.CTkButton(app, text="Logout", font=("Arial", 16)).place(relx=0.45, rely=0.01)
+    customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.15)
+    chn_id_textbox = customtkinter.CTkEntry(app, width=900, height=25, font=("Arial", 16))
+    chn_id_textbox.place(relx=0.15, rely=0.15)
+    customtkinter.CTkButton(app, text="Validate", command=chnidbtn, font=("Arial", 16)).place(relx=0.45, rely=0.22)
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
