@@ -54,11 +54,22 @@ def login():
                 "authorization": "Bot " + tkn_textbox.get()
             })).json()["id"]
             app.destroy()
+            program().mainloop()
     customtkinter.CTkButton(app, text="Import from config", command=config, font=("Arial", 16)).place(relx=0.4, rely=0.1)
     customtkinter.CTkLabel(app, text="Insert bot token", font=("Arial", 16)).place(relx=0.01, rely=0.40)
     tkn_textbox = customtkinter.CTkEntry(app, width=700, height=25, font=("Arial", 16))
     tkn_textbox.place(relx=0.15, rely=0.40)
     customtkinter.CTkButton(app, text="Validate", command=loginbtn, font=("Arial", 16)).place(relx=0.4, rely=0.70)
+    return app
+def program():
+    app = customtkinter.CTk()
+    app.title("http_requests")
+    app.resizable(False, False)
+    app.geometry("1130x420+450+450")
+    app.wm_iconbitmap("app_icon.ico")
+    customtkinter.CTkLabel(app, text="User ID " + login.id, font=("Arial", 16)).place(relx=0.01, rely=0.0)
+    username = customtkinter.CTkLabel(app, text="Username " + login.username, font=("Arial", 16))
+    username.place(relx=0.86, rely=0.0)
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
