@@ -53,10 +53,13 @@ def program():
     username = customtkinter.CTkLabel(app, text=f"Logged in as {login.username}", font=("Arial", 16))
     username.place(relx=0.84, rely=0)
     customtkinter.CTkButton(app, text="Logout", font=("Arial", 16)).place(relx=0.45, rely=0.01)
-    customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.15)
+    customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=900, height=25, font=("Arial", 16))
-    chn_id_textbox.place(relx=0.15, rely=0.15)
-    customtkinter.CTkButton(app, text="Validate", command=chnidbtn, font=("Arial", 16)).place(relx=0.45, rely=0.22)
+    chn_id_textbox.place(relx=0.15, rely=0.1)
+    customtkinter.CTkButton(app, text="Validate", command=chnidbtn, font=("Arial", 16)).place(relx=0.45, rely=0.18)
+    customtkinter.CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.3)
+    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"))
+    combobox.place(relx=0.45, rely=0.3)
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
