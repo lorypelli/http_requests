@@ -42,7 +42,7 @@ def program():
     app.geometry("1130x420+450+450")
     app.wm_iconbitmap("app_icon.ico")
     def chnidbtn():
-        response = get("https://discord.com/api/auth/login", headers = {
+        response = get(f"https://discord.com/api/channels/{chn_id_textbox.get()}", headers = {
             "authorization": f"Bot {login.tkn_value}"
         })
         if (response.status_code != 200):
