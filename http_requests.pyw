@@ -2,7 +2,7 @@ import PySimpleGUI
 from requests import get, post, delete, patch, put
 from webbrowser import open
 PySimpleGUI.theme("BlueMono")
-user_version = "SeventhRelease"
+user_version = "EighthRelease"
 is_alpha = False
 github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
 def login(tkn: str = ""):
