@@ -61,8 +61,8 @@ def program():
         return choice
     def confirm():
         def post_msg(msg: str):
-            response = post("https://discord.com/api/channels/" + chn_id_textbox.get() + "/messages", headers = {
-                "authorization": "Bot " + login.tkn_value
+            response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages", headers = {
+                "authorization": f"Bot {login.tkn_value}"
             }, json = {
                 "content": msg
             })
@@ -71,8 +71,8 @@ def program():
             elif (response.status_code == 200):
                 tkinter.messagebox.showinfo("Success", "The message has been sent successfully!")
         def edit_chn(chn_id: str, chn_name: str):
-            response = patch("https://discord.com/api/channels/" + chn_id, headers = {
-                "authorization": "Bot " + login.tkn_value
+            response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
             }, json = {
                 "name": chn_name
             })
