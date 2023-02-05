@@ -52,14 +52,60 @@ def program():
             msg_textbox.place(relx=0.3, rely=0.35)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            confirm_action.configure(text="Send")
         elif (choice == "Edit a channel"):
-            msg_label.place_forget()
-            msg_textbox.place_forget()
             chn_name_label.place(relx=0.01, rely=0.35)
             chn_name_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
-        return choice
+        elif (choice == "Edit a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place(relx=0.01, rely=0.47)
+            msg_textbox.place(relx=0.3, rely=0.47)
+            msg_textbox.configure(height=75)
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Edit")
+        elif (choice == "Pin a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Pin")
+        elif (choice == "Unpin a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Unpin")
+        elif (choice == "Delete a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Delete")
+        elif (choice == "Delete a channel"):
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Delete")
     def confirm():
+        choice = combobox.get()
         def post_msg(msg: str):
             response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages", headers = {
                 "authorization": f"Bot {login.tkn_value}"
@@ -70,6 +116,40 @@ def program():
                 tkinter.messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 tkinter.messagebox.showinfo("Success", "The message has been sent successfully!")
+        def edit_msg(msg_id: str, msg: str):
+            response = patch(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            }, json = {
+                "content": msg
+            })
+            if (response.status_code != 200):
+                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                tkinter.messagebox.showinfo("Success", "The message has been edited successfully!")
+        def delete_msg(msg_id: str):
+            response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 204):
+                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                tkinter.messagebox.showinfo("Success", "The message has been deleted successfully!")
+        def pin_msg(msg_id: str):
+            response = put(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 204):
+                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                tkinter.messagebox.showinfo("Success", "The message has been pinned successfully!")
+        def unpin_msg(msg_id: str):
+            response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 204):
+                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                tkinter.messagebox.showinfo("Success", "The message has been unpinned successfully!")
         def edit_chn(chn_id: str, chn_name: str):
             response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
@@ -80,13 +160,31 @@ def program():
                 tkinter.messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 tkinter.messagebox.showinfo("Success", "The channel has been edited successfully!")
-        if (combochoice("Write a message")):
+        def delete_chn(chn_id: str):
+            response = delete(f"https://discord.com/api/channels/{chn_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 200):
+                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                tkinter.messagebox.showinfo("Success", "The channel has been deleted successfully!")
+        if (choice == "Write a message"):
             post_msg(msg_textbox.get("0.0", "end"))
-        elif (combochoice("Edit a channel")):
-            edit_chn(chn_id_textbox, chn_name_textbox)
+        elif (choice == "Edit a message"):
+            edit_msg(msg_id_textbox.get(), msg_textbox.get("0.0", "end"))
+        elif (choice == "Delete a message"):
+            delete_msg(msg_id_textbox.get())
+        elif (choice == "Pin a message"):
+            pin_msg(msg_id_textbox.get())
+        elif (choice == "Unpin a message"):
+            unpin_msg(msg_id_textbox.get())
+        elif (choice == "Edit a channel"):
+            edit_chn(chn_id_textbox.get(), chn_name_textbox.get())
+        elif (choice == "Delete a channel"):
+            delete_chn(chn_id_textbox.get())
     customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
     username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
-    username.place(relx=0.65, rely=0)
+    username.place(relx=0.45, rely=0)
     customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
     customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
@@ -98,6 +196,10 @@ def program():
     msg_label.place(relx=0.01, rely=0.35)
     msg_textbox = customtkinter.CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
     msg_textbox.place(relx=0.3, rely=0.35)
+    msg_id_label = customtkinter.CTkLabel(app, text="Insert message id", font=("Arial", 16))
+    msg_id_label.place(relx=0.01, rely=0.35)
+    msg_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    msg_id_textbox.place(relx=0.3, rely=0.1)
     confirm_action = customtkinter.CTkButton(app, text="Send", font=("Arial", 16), command=confirm)
     confirm_action.place(relx=0.4, rely=0.8)
     chn_name_label = customtkinter.CTkLabel(app, text="Insert channel name", font=("Arial", 16))
