@@ -49,17 +49,33 @@ def program():
             tkinter.messagebox.showerror("Error", "There was an error, try again!")
         elif (response.status_code == 200):
             tkinter.messagebox.showinfo("Success", "Validation Passed!")
+    def logout():
+        response = tkinter.messagebox.askyesno("Logout", "Are you sure you want to logout")
+        if (response == True):
+            app.destroy()
+            login().mainloop()
+    def combochoice(choice):
+        if (choice != "Write a message"):
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+        elif (choice == "Write a message"):
+            msg_label.place(relx=0.01, rely=0.4)
+            msg_textbox.place(relx=0.3, rely=0.4)
     customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
     username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
     username.place(relx=0.65, rely=0)
-    customtkinter.CTkButton(app, text="Logout", font=("Arial", 16)).place(relx=0.36, rely=0.01)
+    customtkinter.CTkButton(app, text="Logout", command=logout, font=("Arial", 16)).place(relx=0.36, rely=0.01)
     customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
     chn_id_textbox.place(relx=0.3, rely=0.1)
     customtkinter.CTkButton(app, text="Validate", command=chnidbtn, font=("Arial", 16)).place(relx=0.4, rely=0.18)
     customtkinter.CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.3)
-    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"))
+    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.3)
+    msg_label = customtkinter.CTkLabel(app, text="Insert message", font=("Arial", 16))
+    msg_label.place(relx=0.01, rely=0.4)
+    msg_textbox = customtkinter.CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
+    msg_textbox.place(relx=0.3, rely=0.4)
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
