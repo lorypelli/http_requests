@@ -1,280 +1,257 @@
-import PySimpleGUI
+import customtkinter
+from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
-PySimpleGUI.theme("BlueMono")
-user_version = "EighthRelease"
+user_version = "NinthRelease"
 is_alpha = False
 github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
-def login(tkn: str = ""):
-    bot_token = [
-        [PySimpleGUI.Text("Insert bot token"), PySimpleGUI.Input(tkn, size=(100), key="tkn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
-        [PySimpleGUI.Button("Validate")]
-    ]
-    window = PySimpleGUI.Window("Login", bot_token, element_justification="c", icon="./app_icon.ico", font="Arial", size=(850, 75))
-    while True:
-        if (user_version != github_version and is_alpha == False):
-            response = PySimpleGUI.popup("A new version is avaible, please update!", no_titlebar=True)
-            open("https://github.com/LoryPelli/http_requests/releases/latest")
-            window.close()
-        event, values = window.read()
-        if (event == "Validate"):
-            response = get("https://discord.com/api/auth/login", headers = {
-                "authorization": "Bot " + values["tkn_textbox"]
-            })
-            if (response.status_code != 200 and event == "Validate"):
-                PySimpleGUI.popup("There was an error, try again!", no_titlebar=True)
-            elif (response.status_code == 200 and event == "Validate"):
-                PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
-                login.tkn_value = values["tkn_textbox"]
-                login.username = (get("https://discord.com/api/users/@me", headers = {
-                    "authorization": "Bot " + values["tkn_textbox"]
-                })).json()["username"]
-                login.id = (get("https://discord.com/api/users/@me", headers = {
-                    "authorization": "Bot " + values["tkn_textbox"]
-                })).json()["id"]
-                window.close()
-                program()
-        elif (event == PySimpleGUI.WIN_CLOSED):
-            break
+customtkinter.set_appearance_mode("System")
+customtkinter.set_default_color_theme("dark-blue")
+response = get("https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico")
+def login():
+    app = customtkinter.CTk()
+    app.title("Login")
+    app.resizable(False, False)
+    app.geometry("840x70+500+500")
+    try:
+        app.wm_iconbitmap("app_icon.ico")
+    except:
+        pass
+    def loginbtn():
+        response = get("https://discord.com/api/auth/login", headers = {
+            "authorization": f"Bot {tkn_textbox.get()}"
+        })
+        if (response.status_code != 200):
+            messagebox.showerror("Error", "There was an error, try again!")
+        elif (response.status_code == 200):
+            messagebox.showinfo("Success", "Validation Passed!")
+            login.tkn_value = tkn_textbox.get()
+            login.username = (get("https://discord.com/api/users/@me", headers = {
+                "authorization": f"Bot {tkn_textbox.get()}"
+            })).json()["username"]
+            login.id = (get("https://discord.com/api/users/@me", headers = {
+                "authorization": f"Bot {tkn_textbox.get()}"
+            })).json()["id"]
+            app.destroy()
+            program().mainloop()
+    customtkinter.CTkLabel(app, text="Insert bot token", font=("Arial", 16)).place(relx=0.01, rely=0.1)
+    tkn_textbox = customtkinter.CTkEntry(app, width=700, height=25, font=("Arial", 16))
+    tkn_textbox.place(relx=0.15, rely=0.1)
+    customtkinter.CTkButton(app, text="Validate", command=loginbtn, font=("Arial", 16)).place(relx=0.4, rely=0.5)
+    return app
 def program():
-    logged_user = [
-        [PySimpleGUI.Text("User ID " + login.id), PySimpleGUI.Push(), PySimpleGUI.Button("Logout"), PySimpleGUI.Push(), PySimpleGUI.Text("Logged in as " + login.username, key="username")]
-    ]
-    channel_id = [
-        [PySimpleGUI.Text("Insert channel id"), PySimpleGUI.Input(size=(100), key="chn_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")],
-        [PySimpleGUI.Button("Validate")]
-    ]
-    message = [
-        [PySimpleGUI.Text("Insert message", key="msg_text"), PySimpleGUI.Multiline(size=(100, 5), key="msg_textbox", selected_background_color="#B0B4D4", selected_text_color="#000000")]
-    ]
-    confirm_action_btn = [
-        [PySimpleGUI.Button("Send", key="confirm_action_btn")]
-    ]
-    list = [
-        [PySimpleGUI.Text("Select action"), PySimpleGUI.Combo(["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], size=(100), default_value="Write a message", readonly=True, key="selectbox"), PySimpleGUI.Button("Confirm")]
-    ]
-    message_id = [
-        [PySimpleGUI.Text("Insert message id", key="msg_id_text", visible=False), PySimpleGUI.Input(size=(100), key="msg_id_textbox", visible=False, selected_background_color="#B0B4D4", selected_text_color="#000000")],
-        [PySimpleGUI.Button("Validate", visible=False, key="msg_id_btn")]
-    ]
-    channel_name = [
-        [PySimpleGUI.Text("Insert channel name", key="chn_name_text", visible=False), PySimpleGUI.Input(size=(100), key="chn_name_textbox", visible=False, selected_background_color="#B0B4D4", selected_text_color="#000000")]
-    ]
-    thread_name = [
-        [PySimpleGUI.Text("Insert thread name", key="thread_name_text", visible=False), PySimpleGUI.Input(size=(100), key="thread_name_textbox", visible=False, selected_background_color="#B0B4D4", selected_text_color="#000000")]
-    ]
-    layout = [
-        [logged_user, channel_id, list, channel_name, message, message_id, thread_name, confirm_action_btn]
-    ]
-    window = PySimpleGUI.Window("http_requests", layout, element_justification="c", icon="./app_icon.ico", font="Arial", size=(1130, 420))
-    while True:
-        event, values = window.read()
-        if (event == "Validate"):
-            response = get("https://discord.com/api/channels/" + values["chn_textbox"], headers = {
-                "authorization": "Bot " + login.tkn_value
+    app = customtkinter.CTk()
+    app.title("http_requests")
+    app.resizable(False, False)
+    app.geometry("500x250+450+450")
+    try:
+        app.wm_iconbitmap("app_icon.ico")
+    except:
+        pass
+    def logout():
+        response = messagebox.askyesno("Logout", "Are you sure you want to logout")
+        if (response == True):
+            app.destroy()
+            login().mainloop()
+    def combochoice(choice: str):
+        if (choice == "Write a message"):
+            msg_label.place(relx=0.01, rely=0.35)
+            msg_textbox.place(relx=0.3, rely=0.35)
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Send")
+        elif (choice == "Edit a channel"):
+            chn_name_label.place(relx=0.01, rely=0.35)
+            chn_name_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Edit")
+        elif (choice == "Edit a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place(relx=0.01, rely=0.47)
+            msg_textbox.place(relx=0.3, rely=0.47)
+            msg_textbox.configure(height=75)
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Edit")
+        elif (choice == "Pin a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Pin")
+        elif (choice == "Unpin a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Unpin")
+        elif (choice == "Delete a message"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Delete")
+        elif (choice == "Delete a channel"):
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            confirm_action.configure(text="Delete")
+        elif (choice == "Create a thread"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            thread_name_label.place(relx=0.01, rely=0.35)
+            thread_name_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Create")
+    def confirm():
+        choice = combobox.get()
+        def post_msg(msg: str):
+            response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            }, json = {
+                "content": msg
             })
-            if (response.status_code != 200 and event == "Validate"):
-                PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-            elif (response.status_code == 200 and event == "Validate"):
-                PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
-        elif (event == "msg_id_btn"):
-            response = get("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages/" + values["msg_id_textbox"], headers = {
-                "authorization": "Bot " + login.tkn_value
+            if (response.status_code != 200):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                messagebox.showinfo("Success", "The message has been sent successfully!")
+        def edit_msg(msg_id: str, msg: str):
+            response = patch(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            }, json = {
+                "content": msg
             })
-            if (response.status_code != 200 and event == "msg_id_btn"):
-                PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-            elif (response.status_code == 200 and event == "msg_id_btn"):
-                PySimpleGUI.popup("Validation Passed!", no_titlebar=True)
-        elif (event == "Logout"):
-            response = PySimpleGUI.popup_ok_cancel("Are you sure you want to logout?", no_titlebar=True)
-            if (response == "OK"):
-                window.close()
-                login(login.tkn_value)
-        elif (event == PySimpleGUI.WIN_CLOSED):
-            break
-        elif (values["selectbox"] == "Delete a channel"):
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
-            window["msg_id_text"].Update(visible = False)
-            window["msg_id_textbox"].Update(visible = False)
-            window["msg_id_btn"].Update(visible = False)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Delete")
-        elif (values["selectbox"] == "Delete a message"):
-            window["msg_id_text"].Update(visible = True)
-            window["msg_id_textbox"].Update(visible = True)
-            window["msg_id_btn"].Update(visible = True)
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Delete")
-        elif (values["selectbox"] == "Edit a message"):
-            window["msg_id_text"].Update(visible = True)
-            window["msg_id_textbox"].Update(visible = True)
-            window["msg_id_btn"].Update(visible = True)
-            window["msg_text"].Update(visible = True)
-            window["msg_textbox"].Update(visible = True)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Edit")
-        elif (values["selectbox"] == "Edit a channel"):
-            window["chn_name_text"].Update(visible = True)
-            window["chn_name_textbox"].Update(visible = True)
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
-            window["msg_id_btn"].Update(visible = False)
-            window["msg_id_text"].Update(visible = False)
-            window["msg_id_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Edit")
-        elif (values["selectbox"] == "Create a thread"):
-            window["thread_name_text"].Update(visible = True)
-            window["thread_name_textbox"].Update(visible = True)
-            window["msg_id_text"].Update(visible = True)
-            window["msg_id_textbox"].Update(visible = True)
-            window["msg_id_btn"].Update(visible = True)
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Create")
-        elif (values["selectbox"] == "Pin a message"):
-            window["msg_id_text"].Update(visible = True)
-            window["msg_id_textbox"].Update(visible = True)
-            window["msg_id_btn"].Update(visible = True)
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Pin")
-        elif (values["selectbox"] == "Unpin a message"):
-            window["msg_id_text"].Update(visible = True)
-            window["msg_id_textbox"].Update(visible = True)
-            window["msg_id_btn"].Update(visible = True)
-            window["msg_text"].Update(visible = False)
-            window["msg_textbox"].Update(visible = False)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Unpin")
-        else:
-            window["msg_text"].Update(visible = True)
-            window["msg_textbox"].Update(visible = True)
-            window["msg_id_text"].Update(visible = False)
-            window["msg_id_textbox"].Update(visible = False)
-            window["msg_id_btn"].Update(visible = False)
-            window["chn_name_text"].Update(visible = False)
-            window["chn_name_textbox"].Update(visible = False)
-            window["thread_name_text"].Update(visible = False)
-            window["thread_name_textbox"].Update(visible = False)
-            window["confirm_action_btn"].Update("Send")
-        if (values["selectbox"] != "Delete a channel" and values["selectbox"] != "Delete a message" and values["selectbox"] != "Edit a message" and values["selectbox"] != "Edit a channel" and values["selectbox"] != "Create a thread" and values["selectbox"] != "Pin a message" and values["selectbox"] != "Unpin a message"):
-            def post_msg(msg: str):
-                response = post("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages", headers = {
-                    "authorization": "Bot " + login.tkn_value
-                }, json = {
-                    "content": msg
-                })
-                if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The message has been sent successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                post_msg(values["msg_textbox"])
-        elif (values["selectbox"] == "Delete a channel"):
-            def delete_chn(chn_id: str):
-                response = delete("https://discord.com/api/channels/" + chn_id, headers = {
-                    "authorization": "Bot " + login.tkn_value
-                })
-                if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The channel has been deleted successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                delete_chn(values["chn_textbox"])
-        elif (values["selectbox"] == "Delete a message"):
-            def delete_msg(msg_id: str):
-                response = delete("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages/" + msg_id, headers = {
-                    "authorization": "Bot " + login.tkn_value
-                })
-                if (response.status_code != 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The message has been deleted successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                delete_msg(values["msg_id_textbox"])
-        elif (values["selectbox"] == "Edit a message"):
-            def edit_msg(msg_id: str, msg: str):
-                response = patch("https://discord.com/api/channels/" + values["chn_textbox"] + "/messages/" + msg_id, headers = {
-                    "authorization": "Bot " + login.tkn_value
-                }, json = {
-                    "content": msg
-                })
-                if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The message has been edited successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                edit_msg(values["msg_id_textbox"], values["msg_textbox"])
-        elif (values["selectbox"] == "Edit a channel"):
-            def edit_chn(chn_id: str, chn_name: str):
-                response = patch("https://discord.com/api/channels/" + chn_id, headers = {
-                    "authorization": "Bot " + login.tkn_value
-                }, json = {
-                    "name": chn_name
-                })
-                if (response.status_code != 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 200 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The channel has been edited successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                edit_chn(values["chn_textbox"], values["chn_name_textbox"])
-        elif (values["selectbox"] == "Create a thread"):
-            def create_thread(chn_id: str, msg_id: str, thread_name: str):
-                response = post("https://discord.com/api/channels/" + chn_id + "/messages/" + msg_id + "/threads", headers = {
-                    "authorization": "Bot " + login.tkn_value
-                }, json = {
-                    "name": thread_name
-                })
-                if (response.status_code != 201 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 201 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The thread has been created successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                create_thread(values["chn_textbox"], values["msg_id_textbox"], values["thread_name_textbox"])
-        elif (values["selectbox"] == "Pin a message"):
-            def pin_msg(msg_id: str):
-                response = put("https://discord.com/api/channels/" + values["chn_textbox"] + "/pins/" + msg_id, headers = {
-                    "authorization": "Bot " + login.tkn_value
-                })
-                if (response.status_code != 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The message has been pinned successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                pin_msg(values["msg_id_textbox"])
-        elif (values["selectbox"] == "Unpin a message"):
-            def unpin_msg(msg_id: str):
-                response = delete("https://discord.com/api/channels/" + values["chn_textbox"] + "/pins/" + msg_id, headers = {
-                    "authorization": "Bot " + login.tkn_value
-                })
-                if (response.status_code != 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("There was an error, try again!" + "\n" + str(response.json()), no_titlebar=True)
-                elif (response.status_code == 204 and event == "confirm_action_btn"):
-                    PySimpleGUI.popup("The message has been unpinned successfully!", no_titlebar=True)
-            if (event == "confirm_action_btn"):
-                unpin_msg(values["msg_id_textbox"])
-if (__name__ == "__main__"):
-    login()
+            if (response.status_code != 200):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                messagebox.showinfo("Success", "The message has been edited successfully!")
+        def delete_msg(msg_id: str):
+            response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 204):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                messagebox.showinfo("Success", "The message has been deleted successfully!")
+        def pin_msg(msg_id: str):
+            response = put(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 204):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                messagebox.showinfo("Success", "The message has been pinned successfully!")
+        def unpin_msg(msg_id: str):
+            response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 204):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                messagebox.showinfo("Success", "The message has been unpinned successfully!")
+        def edit_chn(chn_id: str, chn_name: str):
+            response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            }, json = {
+                "name": chn_name
+            })
+            if (response.status_code != 200):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                messagebox.showinfo("Success", "The channel has been edited successfully!")
+        def delete_chn(chn_id: str):
+            response = delete(f"https://discord.com/api/channels/{chn_id}", headers = {
+                "authorization": f"Bot {login.tkn_value}"
+            })
+            if (response.status_code != 200):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                messagebox.showinfo("Success", "The channel has been deleted successfully!")
+        def create_thread(msg_id: str, thread_name: str):
+            response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
+                "authorization": "Bot " + login.tkn_value
+            }, json = {
+                "name": thread_name
+            })
+            if (response.status_code != 201):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 201):
+                messagebox.showinfo("Success", "The thread has been created successfully!")
+        if (choice == "Write a message"):
+            post_msg(msg_textbox.get("0.0", "end"))
+        elif (choice == "Edit a message"):
+            edit_msg(msg_id_textbox.get(), msg_textbox.get("0.0", "end"))
+        elif (choice == "Delete a message"):
+            delete_msg(msg_id_textbox.get())
+        elif (choice == "Pin a message"):
+            pin_msg(msg_id_textbox.get())
+        elif (choice == "Unpin a message"):
+            unpin_msg(msg_id_textbox.get())
+        elif (choice == "Edit a channel"):
+            edit_chn(chn_id_textbox.get(), chn_name_textbox.get())
+        elif (choice == "Delete a channel"):
+            delete_chn(chn_id_textbox.get())
+        elif (choice == "Create a thread"):
+            create_thread(msg_id_textbox.get(), thread_name_textbox.get())
+    customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
+    username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
+    username.place(relx=0.6, rely=0)
+    customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
+    customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
+    chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    chn_id_textbox.place(relx=0.3, rely=0.1)
+    customtkinter.CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
+    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
+    combobox.place(relx=0.3, rely=0.22)
+    msg_label = customtkinter.CTkLabel(app, text="Insert message", font=("Arial", 16))
+    msg_label.place(relx=0.01, rely=0.35)
+    msg_textbox = customtkinter.CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
+    msg_textbox.place(relx=0.3, rely=0.35)
+    msg_id_label = customtkinter.CTkLabel(app, text="Insert message id", font=("Arial", 16))
+    msg_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    confirm_action = customtkinter.CTkButton(app, text="Send", font=("Arial", 16), command=confirm)
+    confirm_action.place(relx=0.4, rely=0.8)
+    chn_name_label = customtkinter.CTkLabel(app, text="Insert channel name", font=("Arial", 16))
+    chn_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    thread_name_label = customtkinter.CTkLabel(app, text="Insert thread name", font=("Arial", 16))
+    thread_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    return app
+if __name__ == "__main__":
+    if (user_version != github_version and is_alpha == False):
+        response = messagebox.showinfo("info", "A new version is avaible, please update!")
+        if (response == "ok"):
+            open("https://github.com/LoryPelli/http_requests/releases/latest")
+    else:
+        login().mainloop()
