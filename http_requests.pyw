@@ -250,8 +250,7 @@ def program():
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
-        response = messagebox.showinfo("info", "A new version is avaible, please update!")
-        if (response == "ok"):
-            open("https://github.com/LoryPelli/http_requests/releases/latest")
+        messagebox.showinfo("info", "A new version is avaible, please update!")
+        open("https://github.com/LoryPelli/http_requests/releases/latest")
     else:
         login().mainloop()
