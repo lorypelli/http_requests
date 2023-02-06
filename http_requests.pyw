@@ -1,5 +1,5 @@
 import customtkinter
-import tkinter.messagebox
+from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
 user_version = "NinthRelease"
@@ -7,20 +7,24 @@ is_alpha = True
 github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
+response = get("https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico")
 def login():
     app = customtkinter.CTk()
     app.title("Login")
     app.resizable(False, False)
     app.geometry("840x70+500+500")
-    app.wm_iconbitmap("app_icon.ico")
+    try:
+        app.wm_iconbitmap("app_icon.ico")
+    except:
+        pass
     def loginbtn():
         response = get("https://discord.com/api/auth/login", headers = {
             "authorization": f"Bot {tkn_textbox.get()}"
         })
         if (response.status_code != 200):
-            tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            messagebox.showerror("Error", "There was an error, try again!")
         elif (response.status_code == 200):
-            tkinter.messagebox.showinfo("Success", "Validation Passed!")
+            messagebox.showinfo("Success", "Validation Passed!")
             login.tkn_value = tkn_textbox.get()
             login.username = (get("https://discord.com/api/users/@me", headers = {
                 "authorization": f"Bot {tkn_textbox.get()}"
@@ -40,9 +44,12 @@ def program():
     app.title("http_requests")
     app.resizable(False, False)
     app.geometry("500x250+450+450")
-    app.wm_iconbitmap("app_icon.ico")
+    try:
+        app.wm_iconbitmap("app_icon.ico")
+    except:
+        pass
     def logout():
-        response = tkinter.messagebox.askyesno("Logout", "Are you sure you want to logout")
+        response = messagebox.askyesno("Logout", "Are you sure you want to logout")
         if (response == True):
             app.destroy()
             login().mainloop()
@@ -137,9 +144,9 @@ def program():
                 "content": msg
             })
             if (response.status_code != 200):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
-                tkinter.messagebox.showinfo("Success", "The message has been sent successfully!")
+                messagebox.showinfo("Success", "The message has been sent successfully!")
         def edit_msg(msg_id: str, msg: str):
             response = patch(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
@@ -147,33 +154,33 @@ def program():
                 "content": msg
             })
             if (response.status_code != 200):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
-                tkinter.messagebox.showinfo("Success", "The message has been edited successfully!")
+                messagebox.showinfo("Success", "The message has been edited successfully!")
         def delete_msg(msg_id: str):
             response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
             })
             if (response.status_code != 204):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
-                tkinter.messagebox.showinfo("Success", "The message has been deleted successfully!")
+                messagebox.showinfo("Success", "The message has been deleted successfully!")
         def pin_msg(msg_id: str):
             response = put(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
             })
             if (response.status_code != 204):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
-                tkinter.messagebox.showinfo("Success", "The message has been pinned successfully!")
+                messagebox.showinfo("Success", "The message has been pinned successfully!")
         def unpin_msg(msg_id: str):
             response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
             })
             if (response.status_code != 204):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
-                tkinter.messagebox.showinfo("Success", "The message has been unpinned successfully!")
+                messagebox.showinfo("Success", "The message has been unpinned successfully!")
         def edit_chn(chn_id: str, chn_name: str):
             response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
@@ -181,17 +188,17 @@ def program():
                 "name": chn_name
             })
             if (response.status_code != 200):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
-                tkinter.messagebox.showinfo("Success", "The channel has been edited successfully!")
+                messagebox.showinfo("Success", "The channel has been edited successfully!")
         def delete_chn(chn_id: str):
             response = delete(f"https://discord.com/api/channels/{chn_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
             })
             if (response.status_code != 200):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
-                tkinter.messagebox.showinfo("Success", "The channel has been deleted successfully!")
+                messagebox.showinfo("Success", "The channel has been deleted successfully!")
         def create_thread(msg_id: str, thread_name: str):
             response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
                 "authorization": "Bot " + login.tkn_value
@@ -199,9 +206,9 @@ def program():
                 "name": thread_name
             })
             if (response.status_code != 201):
-                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+                messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 201):
-                tkinter.messagebox.showinfo("Success", "The thread has been created successfully!")
+                messagebox.showinfo("Success", "The thread has been created successfully!")
         if (choice == "Write a message"):
             post_msg(msg_textbox.get("0.0", "end"))
         elif (choice == "Edit a message"):
@@ -243,7 +250,7 @@ def program():
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
-        response = tkinter.messagebox.showinfo("info", "A new version is avaible, please update!")
+        response = messagebox.showinfo("info", "A new version is avaible, please update!")
         if (response == "ok"):
             open("https://github.com/LoryPelli/http_requests/releases/latest")
     else:
