@@ -220,7 +220,7 @@ def program():
             create_thread(msg_id_textbox.get(), thread_name_textbox.get())
     customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
     username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
-    username.place(relx=0.55, rely=0)
+    username.place(relx=0.6, rely=0)
     customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
     customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
