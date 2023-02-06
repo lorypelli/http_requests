@@ -3,7 +3,7 @@ from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
 user_version = "NinthRelease"
-is_alpha = True
+is_alpha = False
 github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
