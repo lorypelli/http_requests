@@ -54,6 +54,8 @@ def program():
             chn_name_textbox.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Send")
         elif (choice == "Edit a channel"):
             chn_name_label.place(relx=0.01, rely=0.35)
@@ -62,6 +64,8 @@ def program():
             msg_textbox.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Edit a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -71,6 +75,8 @@ def program():
             msg_textbox.configure(height=75)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Pin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -79,6 +85,8 @@ def program():
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Pin")
         elif (choice == "Unpin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -87,6 +95,8 @@ def program():
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Unpin")
         elif (choice == "Delete a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -95,6 +105,8 @@ def program():
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Delete a channel"):
             msg_id_label.place_forget()
@@ -103,7 +115,19 @@ def program():
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
             confirm_action.configure(text="Delete")
+        elif (choice == "Create a thread"):
+            msg_id_label.place(relx=0.01, rely=0.35)
+            msg_id_textbox.place(relx=0.3, rely=0.35)
+            thread_name_label.place(relx=0.01, rely=0.35)
+            thread_name_textbox.place(relx=0.3, rely=0.35)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            confirm_action.configure(text="Create")
     def confirm():
         choice = combobox.get()
         def post_msg(msg: str):
@@ -168,6 +192,16 @@ def program():
                 tkinter.messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 tkinter.messagebox.showinfo("Success", "The channel has been deleted successfully!")
+        def create_thread(msg_id: str, thread_name: str):
+            response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
+                "authorization": "Bot " + login.tkn_value
+            }, json = {
+                "name": thread_name
+            })
+            if (response.status_code != 201):
+                tkinter.messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 201):
+                tkinter.messagebox.showinfo("Success", "The thread has been created successfully!")
         if (choice == "Write a message"):
             post_msg(msg_textbox.get("0.0", "end"))
         elif (choice == "Edit a message"):
@@ -182,9 +216,11 @@ def program():
             edit_chn(chn_id_textbox.get(), chn_name_textbox.get())
         elif (choice == "Delete a channel"):
             delete_chn(chn_id_textbox.get())
+        elif (choice == "Create a thread"):
+            create_thread(msg_id_textbox.get(), thread_name_textbox.get())
     customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
     username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
-    username.place(relx=0.45, rely=0)
+    username.place(relx=0.55, rely=0)
     customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
     customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
@@ -202,6 +238,8 @@ def program():
     confirm_action.place(relx=0.4, rely=0.8)
     chn_name_label = customtkinter.CTkLabel(app, text="Insert channel name", font=("Arial", 16))
     chn_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    thread_name_label = customtkinter.CTkLabel(app, text="Insert thread name", font=("Arial", 16))
+    thread_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
     return app
 if __name__ == "__main__":
     if (user_version != github_version and is_alpha == False):
