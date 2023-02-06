@@ -128,8 +128,8 @@ def program():
         elif (choice == "Create a thread"):
             msg_id_label.place(relx=0.01, rely=0.35)
             msg_id_textbox.place(relx=0.3, rely=0.35)
-            thread_name_label.place(relx=0.01, rely=0.35)
-            thread_name_textbox.place(relx=0.3, rely=0.35)
+            thread_name_label.place(relx=0.01, rely=0.465)
+            thread_name_textbox.place(relx=0.3, rely=0.465)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
