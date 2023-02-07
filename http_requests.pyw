@@ -2,9 +2,8 @@ import customtkinter
 from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
-user_version = "NinthRelease"
+user_version = "EleventhRelease"
 is_alpha = False
-github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 response = get("https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico")
@@ -225,10 +224,19 @@ def program():
             delete_chn(chn_id_textbox.get())
         elif (choice == "Create a thread"):
             create_thread(msg_id_textbox.get(), thread_name_textbox.get())
+    def check_for_updates():
+        github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
+        if (github_version != user_version and is_alpha == False):
+            response = messagebox.askyesno("Update", "A new version is avaible, please update!")
+            if (response == True):
+                open("https://github.com/LoryPelli/http_requests/releases/latest")
+        else:
+            messagebox.showinfo("Update", "No updates avaible!")
     customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
     username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
     username.place(relx=0.6, rely=0)
     customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
+    customtkinter.CTkButton(app, text="Check for\nUpdates", font=("Arial", 16), width=25, height=15, command=check_for_updates).place(relx=0.82, rely=0.8)
     customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
     chn_id_textbox.place(relx=0.3, rely=0.1)
@@ -249,8 +257,4 @@ def program():
     thread_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
     return app
 if __name__ == "__main__":
-    if (user_version != github_version and is_alpha == False):
-        messagebox.showinfo("info", "A new version is avaible, please update!")
-        open("https://github.com/LoryPelli/http_requests/releases/latest")
-    else:
-        login().mainloop()
+    login().mainloop()
