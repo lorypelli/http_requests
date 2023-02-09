@@ -3,7 +3,7 @@ from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
-user_version = "EleventhRelease"
+user_version = "TwelfthRelease"
 is_alpha = False
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
