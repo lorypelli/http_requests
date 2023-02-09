@@ -2,11 +2,15 @@ import customtkinter
 from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
+from urllib import request
 user_version = "EleventhRelease"
 is_alpha = False
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
-response = get("https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico")
+try:
+    request.urlretrieve("https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico", "app_icon.ico")
+except:
+    pass
 def login():
     app = customtkinter.CTk()
     app.title("Login")
@@ -17,9 +21,12 @@ def login():
     except:
         pass
     def loginbtn():
-        response = get("https://discord.com/api/auth/login", headers = {
-            "authorization": f"Bot {tkn_textbox.get()}"
-        })
+        try:
+            response = get("https://discord.com/api/auth/login", headers = {
+                "authorization": f"Bot {tkn_textbox.get()}"
+            })
+        except:
+            messagebox.showerror("Error", "Check your internet connection")
         if (response.status_code != 200):
             messagebox.showerror("Error", "There was an error, try again!")
         elif (response.status_code == 200):
@@ -137,11 +144,14 @@ def program():
     def confirm():
         choice = combobox.get()
         def post_msg(msg: str):
-            response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages", headers = {
-                "authorization": f"Bot {login.tkn_value}"
-            }, json = {
-                "content": msg
-            })
+            try:
+                response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                }, json = {
+                    "content": msg
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
@@ -165,45 +175,60 @@ def program():
             elif (response.status_code == 204):
                 messagebox.showinfo("Success", "The message has been deleted successfully!")
         def pin_msg(msg_id: str):
-            response = put(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
-                "authorization": f"Bot {login.tkn_value}"
-            })
+            try:
+                response = put(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 messagebox.showinfo("Success", "The message has been pinned successfully!")
         def unpin_msg(msg_id: str):
-            response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
-                "authorization": f"Bot {login.tkn_value}"
-            })
+            try:
+                response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 messagebox.showinfo("Success", "The message has been unpinned successfully!")
         def edit_chn(chn_id: str, chn_name: str):
-            response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
-                "authorization": f"Bot {login.tkn_value}"
-            }, json = {
-                "name": chn_name
-            })
+            try:
+                response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                }, json = {
+                    "name": chn_name
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 messagebox.showinfo("Success", "The channel has been edited successfully!")
         def delete_chn(chn_id: str):
-            response = delete(f"https://discord.com/api/channels/{chn_id}", headers = {
-                "authorization": f"Bot {login.tkn_value}"
-            })
+            try:
+                response = delete(f"https://discord.com/api/channels/{chn_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 messagebox.showinfo("Success", "The channel has been deleted successfully!")
         def create_thread(msg_id: str, thread_name: str):
-            response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
-                "authorization": "Bot " + login.tkn_value
-            }, json = {
-                "name": thread_name
-            })
+            try:
+                response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
+                    "authorization": "Bot " + login.tkn_value
+                }, json = {
+                    "name": thread_name
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 201):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 201):
@@ -225,7 +250,10 @@ def program():
         elif (choice == "Create a thread"):
             create_thread(msg_id_textbox.get(), thread_name_textbox.get())
     def check_for_updates():
-        github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
+        try:
+            github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
+        except:
+            messagebox.showerror("Error", "Check your internet connection")
         if (github_version != user_version and is_alpha == False):
             response = messagebox.askyesno("Update", "A new version is avaible, please update!")
             if (response == True):
