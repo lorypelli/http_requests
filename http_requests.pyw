@@ -3,12 +3,18 @@ from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
-user_version = "TwelfthRelease"
+from os import environ, getenv, path, makedirs
+user_version = "ThirteenthRelease"
 is_alpha = False
+icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
+icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
+icon_file = f"{icon_directory}/app_icon.ico"
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
+if (not(path.exists(icon_directory))):
+    makedirs(icon_directory)
 try:
-    request.urlretrieve("https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico", "app_icon.ico")
+    request.urlretrieve(icon_url, icon_file)
 except:
     pass
 def login():
@@ -17,7 +23,7 @@ def login():
     app.resizable(False, False)
     app.geometry("840x70+500+500")
     try:
-        app.wm_iconbitmap("app_icon.ico")
+        app.wm_iconbitmap(icon_file)
     except:
         pass
     def loginbtn():
@@ -51,7 +57,7 @@ def program():
     app.resizable(False, False)
     app.geometry("500x250+450+450")
     try:
-        app.wm_iconbitmap("app_icon.ico")
+        app.wm_iconbitmap(icon_file)
     except:
         pass
     def logout():
