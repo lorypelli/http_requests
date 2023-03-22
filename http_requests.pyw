@@ -4,7 +4,7 @@ from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
 from os import environ, getenv, path, makedirs
-user_version = "ThirteenthRelease"
+user_version = "FourteenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -69,6 +69,7 @@ def program():
         if (choice == "Write a message"):
             msg_label.place(relx=0.01, rely=0.35)
             msg_textbox.place(relx=0.3, rely=0.35)
+            msg_textbox.configure(height=100)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             msg_id_label.place_forget()
