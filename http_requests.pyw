@@ -4,7 +4,7 @@ from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
 from os import environ, getenv, path, makedirs
-user_version = "FourteenthRelease"
+user_version = "FifteenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -28,7 +28,7 @@ def login():
         pass
     def loginbtn():
         try:
-            response = get("https://discord.com/api/auth/login", headers = {
+            response = get("https://discord.com/api/v10/auth/login", headers = {
                 "authorization": f"Bot {tkn_textbox.get()}"
             })
         except:
@@ -38,10 +38,10 @@ def login():
         elif (response.status_code == 200):
             messagebox.showinfo("Success", "Validation Passed!")
             login.tkn_value = tkn_textbox.get()
-            login.username = (get("https://discord.com/api/users/@me", headers = {
+            login.username = (get("https://discord.com/api/v10/users/@me", headers = {
                 "authorization": f"Bot {tkn_textbox.get()}"
             })).json()["username"]
-            login.id = (get("https://discord.com/api/users/@me", headers = {
+            login.id = (get("https://discord.com/api/v10/users/@me", headers = {
                 "authorization": f"Bot {tkn_textbox.get()}"
             })).json()["id"]
             app.destroy()
@@ -152,7 +152,7 @@ def program():
         choice = combobox.get()
         def post_msg(msg: str):
             try:
-                response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages", headers = {
+                response = post(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages", headers = {
                     "authorization": f"Bot {login.tkn_value}"
                 }, json = {
                     "content": msg
@@ -164,7 +164,7 @@ def program():
             elif (response.status_code == 200):
                 messagebox.showinfo("Success", "The message has been sent successfully!")
         def edit_msg(msg_id: str, msg: str):
-            response = patch(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
+            response = patch(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
             }, json = {
                 "content": msg
@@ -174,7 +174,7 @@ def program():
             elif (response.status_code == 200):
                 messagebox.showinfo("Success", "The message has been edited successfully!")
         def delete_msg(msg_id: str):
-            response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
+            response = delete(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
             })
             if (response.status_code != 204):
@@ -183,7 +183,7 @@ def program():
                 messagebox.showinfo("Success", "The message has been deleted successfully!")
         def pin_msg(msg_id: str):
             try:
-                response = put(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                response = put(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
                     "authorization": f"Bot {login.tkn_value}"
                 })
             except:
@@ -194,7 +194,7 @@ def program():
                 messagebox.showinfo("Success", "The message has been pinned successfully!")
         def unpin_msg(msg_id: str):
             try:
-                response = delete(f"https://discord.com/api/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
+                response = delete(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
                     "authorization": f"Bot {login.tkn_value}"
                 })
             except:
@@ -205,7 +205,7 @@ def program():
                 messagebox.showinfo("Success", "The message has been unpinned successfully!")
         def edit_chn(chn_id: str, chn_name: str):
             try:
-                response = patch(f"https://discord.com/api/channels/{chn_id}", headers = {
+                response = patch(f"https://discord.com/api/v10/channels/{chn_id}", headers = {
                     "authorization": f"Bot {login.tkn_value}"
                 }, json = {
                     "name": chn_name
@@ -218,7 +218,7 @@ def program():
                 messagebox.showinfo("Success", "The channel has been edited successfully!")
         def delete_chn(chn_id: str):
             try:
-                response = delete(f"https://discord.com/api/channels/{chn_id}", headers = {
+                response = delete(f"https://discord.com/api/v10/channels/{chn_id}", headers = {
                     "authorization": f"Bot {login.tkn_value}"
                 })
             except:
@@ -229,7 +229,7 @@ def program():
                 messagebox.showinfo("Success", "The channel has been deleted successfully!")
         def create_thread(msg_id: str, thread_name: str):
             try:
-                response = post(f"https://discord.com/api/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
+                response = post(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
                     "authorization": "Bot " + login.tkn_value
                 }, json = {
                     "name": thread_name
