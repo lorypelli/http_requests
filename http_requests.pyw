@@ -4,7 +4,7 @@ from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
 from os import environ, getenv, path, makedirs
-user_version = "FifteenthRelease"
+user_version = "SixteenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -28,7 +28,7 @@ def login():
         pass
     def loginbtn():
         try:
-            response = get("https://discord.com/api/v10/auth/login", headers = {
+            response = post("https://discord.com/api/v10/auth/login", headers = {
                 "authorization": f"Bot {tkn_textbox.get()}"
             })
         except:
@@ -70,22 +70,30 @@ def program():
             msg_label.place(relx=0.01, rely=0.35)
             msg_textbox.place(relx=0.3, rely=0.35)
             msg_textbox.configure(height=100)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Send")
         elif (choice == "Edit a channel"):
             chn_name_label.place(relx=0.01, rely=0.35)
             chn_name_textbox.place(relx=0.3, rely=0.35)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             msg_label.place_forget()
             msg_textbox.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Edit a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -93,42 +101,60 @@ def program():
             msg_label.place(relx=0.01, rely=0.47)
             msg_textbox.place(relx=0.3, rely=0.47)
             msg_textbox.configure(height=75)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Pin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
             msg_id_textbox.place(relx=0.3, rely=0.35)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Pin")
         elif (choice == "Unpin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
             msg_id_textbox.place(relx=0.3, rely=0.35)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Unpin")
         elif (choice == "Delete a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
             msg_id_textbox.place(relx=0.3, rely=0.35)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Delete a channel"):
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             msg_label.place_forget()
@@ -137,16 +163,36 @@ def program():
             chn_name_textbox.place_forget()
             thread_name_label.place_forget()
             thread_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Create a thread"):
             msg_id_label.place(relx=0.01, rely=0.35)
             msg_id_textbox.place(relx=0.3, rely=0.35)
             thread_name_label.place(relx=0.01, rely=0.465)
             thread_name_textbox.place(relx=0.3, rely=0.465)
+            chn_id_label.place(relx=0.01, rely=0.1)
+            chn_id_textbox.place(relx=0.3, rely=0.1)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
+            guild_id_label.place_forget()
+            guild_id_textbox.place_forget()
+            confirm_action.configure(text="Create")
+        elif (choice == "Create a channel"):
+            guild_id_label.place(relx=0.01, rely=0.1)
+            guild_id_textbox.place(relx=0.3, rely=0.1)
+            chn_name_label.place(relx=0.01, rely=0.35)
+            chn_name_textbox.place(relx=0.3, rely=0.35)
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_id_label.place_forget()
+            chn_id_textbox.place_forget()
             confirm_action.configure(text="Create")
     def confirm():
         choice = combobox.get()
@@ -203,6 +249,19 @@ def program():
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 messagebox.showinfo("Success", "The message has been unpinned successfully!")
+        def create_chn(guild_id: str, chn_name: str):
+            try:
+                response = post(f"https://discord.com/api/v10/guilds/{guild_id}/channels", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                }, json = {
+                    "name": chn_name
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 201):
+                messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 201):
+                messagebox.showinfo("Success", "The channel has been created successfully!")
         def edit_chn(chn_id: str, chn_name: str):
             try:
                 response = patch(f"https://discord.com/api/v10/channels/{chn_id}", headers = {
@@ -250,6 +309,8 @@ def program():
             pin_msg(msg_id_textbox.get())
         elif (choice == "Unpin a message"):
             unpin_msg(msg_id_textbox.get())
+        elif (choice == "Create a channel"):
+            create_chn(guild_id_textbox.get(), chn_name_textbox.get())
         elif (choice == "Edit a channel"):
             edit_chn(chn_id_textbox.get(), chn_name_textbox.get())
         elif (choice == "Delete a channel"):
@@ -257,11 +318,14 @@ def program():
         elif (choice == "Create a thread"):
             create_thread(msg_id_textbox.get(), thread_name_textbox.get())
     def check_for_updates():
+        if (is_alpha == True) :
+            messagebox.showerror("Error", "Not allowed with alpha version")
+            return
         try:
             github_version = (get("https://api.github.com/repos/lorypelli/http_requests/releases/latest")).json()["tag_name"]
         except:
             messagebox.showerror("Error", "Check your internet connection")
-        if (github_version != user_version and is_alpha == False):
+        if (github_version != user_version):
             response = messagebox.askyesno("Update", "A new version is avaible, please update!")
             if (response == True):
                 open("https://github.com/LoryPelli/http_requests/releases/latest")
@@ -272,11 +336,14 @@ def program():
     username.place(relx=0.6, rely=0)
     customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
     customtkinter.CTkButton(app, text="Check for\nUpdates", font=("Arial", 16), width=25, height=15, command=check_for_updates).place(relx=0.82, rely=0.8)
-    customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16)).place(relx=0.01, rely=0.1)
+    chn_id_label = customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16))
+    chn_id_label.place(relx=0.01, rely=0.1)
     chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
     chn_id_textbox.place(relx=0.3, rely=0.1)
+    guild_id_label = customtkinter.CTkLabel(app, text="Insert guild id", font=("Arial", 16))
+    guild_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
     customtkinter.CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
-    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
+    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.22)
     msg_label = customtkinter.CTkLabel(app, text="Insert message", font=("Arial", 16))
     msg_label.place(relx=0.01, rely=0.35)
