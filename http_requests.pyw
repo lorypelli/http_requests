@@ -118,6 +118,7 @@ def program():
             run(disconnection())
             app.destroy()
             login().mainloop()
+    app.protocol("WM_DELETE_WINDOW", logout)
     def combochoice(choice: str):
         if (choice == "Write a message"):
             msg_label.place(relx=0.01, rely=0.35)
