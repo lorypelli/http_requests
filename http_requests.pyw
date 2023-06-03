@@ -4,6 +4,9 @@ from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
 from os import environ, getenv, path, makedirs
+from asyncio import run
+from websockets.sync.client import connect
+from json import dumps
 user_version = "SixteenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
@@ -17,6 +20,28 @@ try:
     request.urlretrieve(icon_url, icon_file)
 except:
     pass
+async def connect_to_gateway(token: str):
+    ws = connect("wss://gateway.discord.gg/?v=10&encoding=json")
+    payload = {
+        "op": 2,
+        "d": {
+            "token": token,
+            "intents": 0,
+            "properties": {
+                "os": "linux",
+                "browser": "http_requests",
+                "device": "discord"
+            },
+            "presence": {
+                "activities": [{
+                    "name": "http_requests",
+                    "type": 3
+                }],
+                "status": "dnd"
+            }
+        }
+    }
+    ws.send(dumps(payload))
 def login():
     app = customtkinter.CTk()
     app.title("Login")
@@ -27,6 +52,8 @@ def login():
     except:
         pass
     def loginbtn():
+        async def connection():
+            await connect_to_gateway(tkn_textbox.get())
         try:
             response = post("https://discord.com/api/v10/auth/login", headers = {
                 "authorization": f"Bot {tkn_textbox.get()}"
@@ -36,6 +63,7 @@ def login():
         if (response.status_code != 200):
             messagebox.showerror("Error", "There was an error, try again!")
         elif (response.status_code == 200):
+            run(connection())
             messagebox.showinfo("Success", "Validation Passed!")
             login.tkn_value = tkn_textbox.get()
             login.username = (get("https://discord.com/api/v10/users/@me", headers = {
@@ -63,6 +91,31 @@ def program():
     def logout():
         response = messagebox.askyesno("Logout", "Are you sure you want to logout")
         if (response == True):
+            async def disconnect(token: str):
+                ws = connect("wss://gateway.discord.gg/?v=10&encoding=json")
+                payload = {
+                    "op": 2,
+                    "d": {
+                        "token": token,
+                        "intents": 0,
+                        "properties": {
+                            "os": "linux",
+                            "browser": "http_requests",
+                            "device": "discord"
+                        },
+                        "presence": {
+                            "activities": [{
+                                "name": "disconnecting...",
+                                "type": 3
+                            }],
+                            "status": "idle"
+                        }
+                    }
+                }
+                ws.send(dumps(payload))
+            async def disconnection():
+                await disconnect(login.tkn_value)
+            run(disconnection())
             app.destroy()
             login().mainloop()
     def combochoice(choice: str):
@@ -195,6 +248,8 @@ def program():
             chn_id_textbox.place_forget()
             confirm_action.configure(text="Create")
     def confirm():
+        async def connection():
+            await connect_to_gateway(login.tkn_value)
         choice = combobox.get()
         def post_msg(msg: str):
             try:
@@ -208,6 +263,7 @@ def program():
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
+                run(connection())
                 messagebox.showinfo("Success", "The message has been sent successfully!")
         def edit_msg(msg_id: str, msg: str):
             response = patch(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
@@ -218,6 +274,7 @@ def program():
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
+                run(connection())
                 messagebox.showinfo("Success", "The message has been edited successfully!")
         def delete_msg(msg_id: str):
             response = delete(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
@@ -226,6 +283,7 @@ def program():
             if (response.status_code != 204):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
+                run(connection())
                 messagebox.showinfo("Success", "The message has been deleted successfully!")
         def pin_msg(msg_id: str):
             try:
@@ -237,6 +295,7 @@ def program():
             if (response.status_code != 204):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
+                run(connection())
                 messagebox.showinfo("Success", "The message has been pinned successfully!")
         def unpin_msg(msg_id: str):
             try:
@@ -248,6 +307,7 @@ def program():
             if (response.status_code != 204):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
+                run(connection())
                 messagebox.showinfo("Success", "The message has been unpinned successfully!")
         def create_chn(guild_id: str, chn_name: str):
             try:
@@ -261,6 +321,7 @@ def program():
             if (response.status_code != 201):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 201):
+                run(connection())
                 messagebox.showinfo("Success", "The channel has been created successfully!")
         def edit_chn(chn_id: str, chn_name: str):
             try:
@@ -274,6 +335,7 @@ def program():
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
+                run(connection())
                 messagebox.showinfo("Success", "The channel has been edited successfully!")
         def delete_chn(chn_id: str):
             try:
@@ -285,6 +347,7 @@ def program():
             if (response.status_code != 200):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
+                run(connection())
                 messagebox.showinfo("Success", "The channel has been deleted successfully!")
         def create_thread(msg_id: str, thread_name: str):
             try:
@@ -298,6 +361,7 @@ def program():
             if (response.status_code != 201):
                 messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 201):
+                run(connection())
                 messagebox.showinfo("Success", "The thread has been created successfully!")
         if (choice == "Write a message"):
             post_msg(msg_textbox.get("0.0", "end"))
