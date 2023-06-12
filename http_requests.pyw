@@ -7,7 +7,7 @@ from os import environ, getenv, path, makedirs
 from asyncio import run
 from websockets.sync.client import connect
 from json import dumps
-user_version = "SeventeenthRelease"
+user_version = "EighteenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -136,6 +136,8 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Send")
         elif (choice == "Edit a channel"):
             chn_name_label.place(relx=0.01, rely=0.35)
@@ -152,6 +154,8 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Edit a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -169,6 +173,8 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Pin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -185,8 +191,10 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Pin")
-        elif (choice == "Unpin a message"):
+        elif (choice in ["Delete a message", "Unpin a message"]):
             msg_id_label.place(relx=0.01, rely=0.35)
             msg_id_textbox.place(relx=0.3, rely=0.35)
             chn_id_label.place(relx=0.01, rely=0.1)
@@ -201,23 +209,12 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
-            confirm_action.configure(text="Unpin")
-        elif (choice == "Delete a message"):
-            msg_id_label.place(relx=0.01, rely=0.35)
-            msg_id_textbox.place(relx=0.3, rely=0.35)
-            chn_id_label.place(relx=0.01, rely=0.1)
-            chn_id_textbox.place(relx=0.3, rely=0.1)
-            msg_label.place_forget()
-            msg_textbox.place_forget()
-            chn_name_label.place_forget()
-            chn_name_textbox.place_forget()
-            thread_name_label.place_forget()
-            thread_name_textbox.place_forget()
-            guild_id_label.place_forget()
-            guild_id_textbox.place_forget()
-            chn_type_label.place_forget()
-            chn_type.place_forget()
-            confirm_action.configure(text="Delete")
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
+            if (choice == "Delete a message"):
+                confirm_action.configure(text="Delete")
+            elif (choice == "Unpin a message"):
+                confirm_action.configure(text="Unpin")
         elif (choice == "Delete a channel"):
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
@@ -233,6 +230,8 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Create a thread"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -249,6 +248,8 @@ def program():
             guild_id_textbox.place_forget()
             chn_type_label.place_forget()
             chn_type.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Create")
         elif (choice == "Create a channel"):
             guild_id_label.place(relx=0.01, rely=0.1)
@@ -265,7 +266,32 @@ def program():
             msg_textbox.place_forget()
             chn_id_label.place_forget()
             chn_id_textbox.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
             confirm_action.configure(text="Create")
+        elif (choice in ["Kick a user", "Ban a user", "Unban a user"]):
+            guild_id_label.place(relx=0.01, rely=0.1)
+            guild_id_textbox.place(relx=0.3, rely=0.1)
+            usr_id_label.place(relx=0.01, rely=0.35)
+            usr_id_textbox.place(relx=0.3, rely=0.35)
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            chn_type_label.place_forget()
+            chn_type.place_forget()
+            chn_id_label.place_forget()
+            chn_id_textbox.place_forget()
+            if (choice == "Kick a user"):
+                confirm_action.configure(text="Kick")
+            elif (choice == "Ban a user"):
+                confirm_action.configure(text="Ban")
+            elif (choice == "Unban a user"):
+                confirm_action.configure(text="Unban")
     def confirm():
         async def connection():
             await connect_to_gateway(login.tkn_value)
@@ -283,7 +309,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 200):
                 run(connection())
-                messagebox.showinfo("Success", "The message has been sent successfully!")
+                messagebox.showinfo("Success", "The message has been successfully sent!")
         def edit_msg(msg_id: str, msg: str):
             response = patch(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
@@ -294,7 +320,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 200):
                 run(connection())
-                messagebox.showinfo("Success", "The message has been edited successfully!")
+                messagebox.showinfo("Success", "The message has been successfully edited!")
         def delete_msg(msg_id: str):
             response = delete(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}", headers = {
                 "authorization": f"Bot {login.tkn_value}"
@@ -303,7 +329,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 204):
                 run(connection())
-                messagebox.showinfo("Success", "The message has been deleted successfully!")
+                messagebox.showinfo("Success", "The message has been successfully deleted!")
         def pin_msg(msg_id: str):
             try:
                 response = put(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
@@ -315,7 +341,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 204):
                 run(connection())
-                messagebox.showinfo("Success", "The message has been pinned successfully!")
+                messagebox.showinfo("Success", "The message has been successfully pinned!")
         def unpin_msg(msg_id: str):
             try:
                 response = delete(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/pins/{msg_id}", headers = {
@@ -327,7 +353,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 204):
                 run(connection())
-                messagebox.showinfo("Success", "The message has been unpinned successfully!")
+                messagebox.showinfo("Success", "The message has been successfully unpinned!")
         def create_chn(guild_id: str, chn_name: str, choice: str):
             if (choice == "Text"):
                 choice = 0
@@ -350,7 +376,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 201):
                 run(connection())
-                messagebox.showinfo("Success", "The channel has been created successfully!")
+                messagebox.showinfo("Success", "The channel has been successfully created!")
         def edit_chn(chn_id: str, chn_name: str):
             try:
                 response = patch(f"https://discord.com/api/v10/channels/{chn_id}", headers = {
@@ -364,7 +390,7 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 200):
                 run(connection())
-                messagebox.showinfo("Success", "The channel has been edited successfully!")
+                messagebox.showinfo("Success", "The channel has been successfully edited!")
         def delete_chn(chn_id: str):
             try:
                 response = delete(f"https://discord.com/api/v10/channels/{chn_id}", headers = {
@@ -376,11 +402,11 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 200):
                 run(connection())
-                messagebox.showinfo("Success", "The channel has been deleted successfully!")
+                messagebox.showinfo("Success", "The channel has been successfully deleted!")
         def create_thread(msg_id: str, thread_name: str):
             try:
                 response = post(f"https://discord.com/api/v10/channels/{chn_id_textbox.get()}/messages/{msg_id}/threads", headers = {
-                    "authorization": "Bot " + login.tkn_value
+                    "authorization": f"Bot {login.tkn_value}"
                 }, json = {
                     "name": thread_name
                 })
@@ -390,7 +416,43 @@ def program():
                 messagebox.showerror("Error", response.json()["message"])
             elif (response.status_code == 201):
                 run(connection())
-                messagebox.showinfo("Success", "The thread has been created successfully!")
+                messagebox.showinfo("Success", "The thread has been successfully created!")
+        def kick_usr(guild_id: str, usr_id: str):
+            try:
+                response = delete(f"https://discord.com/api/v10/guilds/{guild_id}/members/{usr_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 204):
+                messagebox.showerror("Error", response.json()["message"])
+            elif (response.status_code == 204):
+                run(connection())
+                messagebox.showinfo("Success", "The user has been successfully kicked!")
+        def ban_usr(guild_id: str, usr_id: str):
+            try:
+                response = put(f"https://discord.com/api/v10/guilds/{guild_id}/bans/{usr_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 204):
+                messagebox.showerror("Error", response.json()["message"])
+            elif (response.status_code == 204):
+                run(connection())
+                messagebox.showinfo("Success", "The user has been successfully banned!")
+        def unban_usr(guild_id: str, usr_id: str):
+            try:
+                response = delete(f"https://discord.com/api/v10/guilds/{guild_id}/bans/{usr_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 204):
+                messagebox.showerror("Error", response.json()["message"])
+            elif (response.status_code == 204):
+                run(connection())
+                messagebox.showinfo("Success", "The user has been successfully unbanned!")
         if (choice == "Write a message"):
             post_msg(msg_textbox.get("0.0", "end"))
         elif (choice == "Edit a message"):
@@ -409,6 +471,12 @@ def program():
             delete_chn(chn_id_textbox.get())
         elif (choice == "Create a thread"):
             create_thread(msg_id_textbox.get(), thread_name_textbox.get())
+        elif (choice == "Kick a user"):
+            kick_usr(guild_id_textbox.get(), usr_id_textbox.get())
+        elif (choice == "Ban a user"):
+            ban_usr(guild_id_textbox.get(), usr_id_textbox.get())
+        elif (choice == "Unban a user"):
+            unban_usr(guild_id_textbox.get(), usr_id_textbox.get())
     def check_for_updates():
         if (is_alpha == True) :
             messagebox.showerror("Error", "Not allowed with alpha version")
@@ -435,7 +503,7 @@ def program():
     guild_id_label = CTkLabel(app, text="Insert guild id", font=("Arial", 16))
     guild_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
-    combobox = CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
+    combobox = CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user"], state="readonly", variable=StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.22)
     chn_type_label = CTkLabel(app, text="Select channel type", font=("Arial", 16))
     chn_type = CTkComboBox(app, values=["Text", "Voice", "Announcement", "Forum"], state="readonly", variable=StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
@@ -451,6 +519,8 @@ def program():
     chn_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     thread_name_label = CTkLabel(app, text="Insert thread name", font=("Arial", 16))
     thread_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    usr_id_label = CTkLabel(app, text="Insert user id", font=("Arial", 16))
+    usr_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     return app
 if __name__ == "__main__":
     login().mainloop()
