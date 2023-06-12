@@ -1,4 +1,4 @@
-import customtkinter
+from customtkinter import set_appearance_mode, set_default_color_theme, CTkLabel, CTkEntry, CTkButton, CTk, CTkComboBox, StringVar, CTkTextbox
 from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
@@ -12,8 +12,8 @@ is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
 icon_file = f"{icon_directory}/app_icon.ico"
-customtkinter.set_appearance_mode("System")
-customtkinter.set_default_color_theme("dark-blue")
+set_appearance_mode("System")
+set_default_color_theme("dark-blue")
 if (not(path.exists(icon_directory))):
     makedirs(icon_directory)
 try:
@@ -43,7 +43,7 @@ async def connect_to_gateway(token: str):
     }
     ws.send(dumps(payload))
 def login():
-    app = customtkinter.CTk()
+    app = CTk()
     app.title("Login")
     app.resizable(False, False)
     app.geometry("840x70+500+500")
@@ -74,13 +74,13 @@ def login():
             })).json()["id"]
             app.destroy()
             program().mainloop()
-    customtkinter.CTkLabel(app, text="Insert bot token", font=("Arial", 16)).place(relx=0.01, rely=0.1)
-    tkn_textbox = customtkinter.CTkEntry(app, width=700, height=25, font=("Arial", 16))
+    CTkLabel(app, text="Insert bot token", font=("Arial", 16)).place(relx=0.01, rely=0.1)
+    tkn_textbox = CTkEntry(app, width=700, height=25, font=("Arial", 16))
     tkn_textbox.place(relx=0.15, rely=0.1)
-    customtkinter.CTkButton(app, text="Validate", command=loginbtn, font=("Arial", 16)).place(relx=0.4, rely=0.5)
+    CTkButton(app, text="Validate", command=loginbtn, font=("Arial", 16)).place(relx=0.4, rely=0.5)
     return app
 def program():
-    app = customtkinter.CTk()
+    app = CTk()
     app.title("http_requests")
     app.resizable(False, False)
     app.geometry("500x250+450+450")
@@ -423,34 +423,34 @@ def program():
                 open("https://github.com/LoryPelli/http_requests/releases/latest")
         else:
             messagebox.showinfo("Update", "No updates avaible!")
-    customtkinter.CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
-    username = customtkinter.CTkLabel(app, text=login.username, font=("Arial", 16))
+    CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
+    username = CTkLabel(app, text=login.username, font=("Arial", 16))
     username.place(relx=0.6, rely=0)
-    customtkinter.CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
-    customtkinter.CTkButton(app, text="Check for\nUpdates", font=("Arial", 16), width=25, height=15, command=check_for_updates).place(relx=0.82, rely=0.8)
-    chn_id_label = customtkinter.CTkLabel(app, text="Insert channel id", font=("Arial", 16))
+    CTkButton(app, text="Logout", font=("Arial", 16), width=25, height=15, command=logout).place(relx=0.85, rely=0.01)
+    CTkButton(app, text="Check for\nUpdates", font=("Arial", 16), width=25, height=15, command=check_for_updates).place(relx=0.82, rely=0.8)
+    chn_id_label = CTkLabel(app, text="Insert channel id", font=("Arial", 16))
     chn_id_label.place(relx=0.01, rely=0.1)
-    chn_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    chn_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     chn_id_textbox.place(relx=0.3, rely=0.1)
-    guild_id_label = customtkinter.CTkLabel(app, text="Insert guild id", font=("Arial", 16))
-    guild_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
-    customtkinter.CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
-    combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
+    guild_id_label = CTkLabel(app, text="Insert guild id", font=("Arial", 16))
+    guild_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
+    combobox = CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.22)
-    chn_type_label = customtkinter.CTkLabel(app, text="Select channel type", font=("Arial", 16))
-    chn_type = customtkinter.CTkComboBox(app, values=["Text", "Voice", "Announcement", "Forum"], state="readonly", variable=customtkinter.StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
-    msg_label = customtkinter.CTkLabel(app, text="Insert message", font=("Arial", 16))
+    chn_type_label = CTkLabel(app, text="Select channel type", font=("Arial", 16))
+    chn_type = CTkComboBox(app, values=["Text", "Voice", "Announcement", "Forum"], state="readonly", variable=StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
+    msg_label = CTkLabel(app, text="Insert message", font=("Arial", 16))
     msg_label.place(relx=0.01, rely=0.35)
-    msg_textbox = customtkinter.CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
+    msg_textbox = CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
     msg_textbox.place(relx=0.3, rely=0.35)
-    msg_id_label = customtkinter.CTkLabel(app, text="Insert message id", font=("Arial", 16))
-    msg_id_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
-    confirm_action = customtkinter.CTkButton(app, text="Send", font=("Arial", 16), command=confirm)
+    msg_id_label = CTkLabel(app, text="Insert message id", font=("Arial", 16))
+    msg_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    confirm_action = CTkButton(app, text="Send", font=("Arial", 16), command=confirm)
     confirm_action.place(relx=0.4, rely=0.8)
-    chn_name_label = customtkinter.CTkLabel(app, text="Insert channel name", font=("Arial", 16))
-    chn_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
-    thread_name_label = customtkinter.CTkLabel(app, text="Insert thread name", font=("Arial", 16))
-    thread_name_textbox = customtkinter.CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    chn_name_label = CTkLabel(app, text="Insert channel name", font=("Arial", 16))
+    chn_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    thread_name_label = CTkLabel(app, text="Insert thread name", font=("Arial", 16))
+    thread_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     return app
 if __name__ == "__main__":
     login().mainloop()
