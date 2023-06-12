@@ -7,7 +7,7 @@ from os import environ, getenv, path, makedirs
 from asyncio import run
 from websockets.sync.client import connect
 from json import dumps
-user_version = "SixteenthRelease"
+user_version = "SeventeenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -134,6 +134,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Send")
         elif (choice == "Edit a channel"):
             chn_name_label.place(relx=0.01, rely=0.35)
@@ -148,6 +150,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Edit a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -163,6 +167,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Pin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -177,6 +183,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Pin")
         elif (choice == "Unpin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -191,6 +199,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Unpin")
         elif (choice == "Delete a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -205,6 +215,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Delete a channel"):
             chn_id_label.place(relx=0.01, rely=0.1)
@@ -219,6 +231,8 @@ def program():
             thread_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Create a thread"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -233,12 +247,16 @@ def program():
             chn_name_textbox.place_forget()
             guild_id_label.place_forget()
             guild_id_textbox.place_forget()
+            channel_type_label.place_forget()
+            channel_type.place_forget()
             confirm_action.configure(text="Create")
         elif (choice == "Create a channel"):
             guild_id_label.place(relx=0.01, rely=0.1)
             guild_id_textbox.place(relx=0.3, rely=0.1)
-            chn_name_label.place(relx=0.01, rely=0.35)
-            chn_name_textbox.place(relx=0.3, rely=0.35)
+            channel_type_label.place(relx=0.01, rely=0.35)
+            channel_type.place(relx=0.3, rely=0.35)
+            chn_name_label.place(relx=0.01, rely=0.465)
+            chn_name_textbox.place(relx=0.3, rely=0.480)
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
@@ -310,12 +328,21 @@ def program():
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been unpinned successfully!")
-        def create_chn(guild_id: str, chn_name: str):
+        def create_chn(guild_id: str, chn_name: str, choice: str):
+            if (choice == "Text"):
+                choice = 0
+            elif (choice == "Voice"):
+                choice = 2
+            elif (choice == "Announcement"):
+                choice = 5
+            elif (choice == "Forum"):
+                choice = 15
             try:
                 response = post(f"https://discord.com/api/v10/guilds/{guild_id}/channels", headers = {
                     "authorization": f"Bot {login.tkn_value}"
                 }, json = {
-                    "name": chn_name
+                    "name": chn_name,
+                    "type": choice
                 })
             except:
                 messagebox.showerror("Error", "Check your internet connection")
@@ -375,7 +402,7 @@ def program():
         elif (choice == "Unpin a message"):
             unpin_msg(msg_id_textbox.get())
         elif (choice == "Create a channel"):
-            create_chn(guild_id_textbox.get(), chn_name_textbox.get())
+            create_chn(guild_id_textbox.get(), chn_name_textbox.get(), channel_type.get())
         elif (choice == "Edit a channel"):
             edit_chn(chn_id_textbox.get(), chn_name_textbox.get())
         elif (choice == "Delete a channel"):
@@ -410,6 +437,8 @@ def program():
     customtkinter.CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
     combobox = customtkinter.CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message"], state="readonly", variable=customtkinter.StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.22)
+    channel_type_label = customtkinter.CTkLabel(app, text="Select channel type", font=("Arial", 16))
+    channel_type = customtkinter.CTkComboBox(app, values=["Text", "Voice", "Announcement", "Forum"], state="readonly", variable=customtkinter.StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
     msg_label = customtkinter.CTkLabel(app, text="Insert message", font=("Arial", 16))
     msg_label.place(relx=0.01, rely=0.35)
     msg_textbox = customtkinter.CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
