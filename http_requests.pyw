@@ -7,7 +7,7 @@ from os import environ, getenv, path, makedirs
 from asyncio import run
 from websockets.sync.client import connect
 from json import dumps
-user_version = "EighteenthRelease"
+user_version = "NineteenthRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -61,7 +61,10 @@ def login():
         except:
             messagebox.showerror("Error", "Check your internet connection")
         if (response.status_code != 200):
-            messagebox.showerror("Error", response.json()["message"])
+            try:
+                messagebox.showerror("Error", response.json()["message"])
+            except:
+                messagebox.showerror("Error", "There was an error, try again!")
         elif (response.status_code == 200):
             run(connection())
             messagebox.showinfo("Success", "Validation Passed!")
@@ -138,6 +141,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Send")
         elif (choice == "Edit a channel"):
             chn_name_label.place(relx=0.01, rely=0.35)
@@ -156,6 +163,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Edit a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -175,6 +186,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Edit")
         elif (choice == "Pin a message"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -193,6 +208,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Pin")
         elif (choice in ["Delete a message", "Unpin a message"]):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -211,6 +230,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             if (choice == "Delete a message"):
                 confirm_action.configure(text="Delete")
             elif (choice == "Unpin a message"):
@@ -232,6 +255,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Delete")
         elif (choice == "Create a thread"):
             msg_id_label.place(relx=0.01, rely=0.35)
@@ -250,6 +277,10 @@ def program():
             chn_type.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Create")
         elif (choice == "Create a channel"):
             guild_id_label.place(relx=0.01, rely=0.1)
@@ -257,7 +288,7 @@ def program():
             chn_type_label.place(relx=0.01, rely=0.35)
             chn_type.place(relx=0.3, rely=0.35)
             chn_name_label.place(relx=0.01, rely=0.465)
-            chn_name_textbox.place(relx=0.3, rely=0.480)
+            chn_name_textbox.place(relx=0.3, rely=0.48)
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
@@ -268,6 +299,10 @@ def program():
             chn_id_textbox.place_forget()
             usr_id_label.place_forget()
             usr_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             confirm_action.configure(text="Create")
         elif (choice in ["Kick a user", "Ban a user", "Unban a user"]):
             guild_id_label.place(relx=0.01, rely=0.1)
@@ -286,12 +321,97 @@ def program():
             chn_type.place_forget()
             chn_id_label.place_forget()
             chn_id_textbox.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
             if (choice == "Kick a user"):
                 confirm_action.configure(text="Kick")
             elif (choice == "Ban a user"):
                 confirm_action.configure(text="Ban")
             elif (choice == "Unban a user"):
                 confirm_action.configure(text="Unban")
+        elif (choice == "Create a role"):
+            guild_id_label.place(relx=0.01, rely=0.1)
+            guild_id_textbox.place(relx=0.3, rely=0.1)
+            role_name_label.place(relx=0.01, rely=0.35)
+            role_name_textbox.place(relx=0.3, rely=0.35)
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
+            chn_id_label.place_forget()
+            chn_id_textbox.place_forget()
+            chn_type_label.place_forget()
+            chn_type.place_forget()
+            role_id_label.place_forget()
+            role_id_textbox.place_forget()
+            confirm_action.configure(text="Create")
+        elif (choice == "Edit a role"):
+            guild_id_label.place(relx=0.01, rely=0.1)
+            guild_id_textbox.place(relx=0.3, rely=0.1)
+            role_id_label.place(relx=0.01, rely=0.35)
+            role_id_textbox.place(relx=0.3, rely=0.35)
+            role_name_label.place(relx=0.01, rely=0.465)
+            role_name_textbox.place(relx=0.3, rely=0.465)
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
+            chn_id_label.place_forget()
+            chn_id_textbox.place_forget()
+            chn_type_label.place_forget()
+            chn_type.place_forget()
+            confirm_action.configure(text="Edit")
+        elif (choice == "Delete a role"):
+            guild_id_label.place(relx=0.01, rely=0.1)
+            guild_id_textbox.place(relx=0.3, rely=0.1)
+            role_id_label.place(relx=0.01, rely=0.35)
+            role_id_textbox.place(relx=0.3, rely=0.35)
+            msg_id_label.place_forget()
+            msg_id_textbox.place_forget()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            usr_id_label.place_forget()
+            usr_id_textbox.place_forget()
+            chn_id_label.place_forget()
+            chn_id_textbox.place_forget()
+            chn_type_label.place_forget()
+            chn_type.place_forget()
+            role_name_label.place_forget()
+            role_name_textbox.place_forget()
+            confirm_action.configure(text="Delete")
+        elif (choice in ["Add a role to a member", "Remove a role from a member"]):
+            role_id_label.place(relx=0.01, rely=0.35)
+            role_id_textbox.place(relx=0.3, rely=0.35)
+            guild_id_label.place(relx=0.01, rely=0.1)
+            guild_id_textbox.place(relx=0.3, rely=0.1)
+            usr_id_label.place(relx=0.01, rely=0.465)
+            usr_id_textbox.place(relx=0.3, rely=0.465)
+            msg_label.place_forget()
+            msg_textbox.place_forget()
+            chn_name_label.place_forget()
+            chn_name_textbox.place_forget()
+            chn_id_label.place_forget()
+            chn_id_textbox.place_configure()
+            thread_name_label.place_forget()
+            thread_name_textbox.place_forget()
+            chn_type_label.place_forget()
+            chn_type.place_forget()
+            if (choice == "Add a role to a member"):
+                confirm_action.configure(text="Add")
+            elif (choice == "Remove a role from a member"):
+                confirm_action.configure(text="Remove")
     def confirm():
         async def connection():
             await connect_to_gateway(login.tkn_value)
@@ -306,7 +426,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 200):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully sent!")
@@ -317,7 +440,10 @@ def program():
                 "content": msg
             })
             if (response.status_code != 200):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully edited!")
@@ -326,7 +452,10 @@ def program():
                 "authorization": f"Bot {login.tkn_value}"
             })
             if (response.status_code != 204):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully deleted!")
@@ -338,7 +467,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully pinned!")
@@ -350,7 +482,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully unpinned!")
@@ -375,7 +510,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 201):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 201):
                 run(connection())
                 messagebox.showinfo("Success", "The channel has been successfully created!")
@@ -389,7 +527,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 200):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The channel has been successfully edited!")
@@ -401,7 +542,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 200):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The channel has been successfully deleted!")
@@ -415,7 +559,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 201):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 201):
                 run(connection())
                 messagebox.showinfo("Success", "The thread has been successfully created!")
@@ -427,7 +574,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The user has been successfully kicked!")
@@ -439,7 +589,10 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The user has been successfully banned!")
@@ -451,10 +604,92 @@ def program():
             except:
                 messagebox.showerror("Error", "Check your internet connection")
             if (response.status_code != 204):
-                messagebox.showerror("Error", response.json()["message"])
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The user has been successfully unbanned!")
+        def create_role(guild_id: str, role_name: str):
+            try:
+                response = post(f"https://discord.com/api/v10/guilds/{guild_id}/roles", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                }, json = {
+                    "name": role_name
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 200):
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                run(connection())
+                messagebox.showinfo("Success", "The role has been successfully created!")
+        def edit_role(guild_id: str, role_id: str, role_name: str):
+            try:
+                response = patch(f"https://discord.com/api/v10/guilds/{guild_id}/roles/{role_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                }, json = {
+                    "name": role_name
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 200):
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                run(connection())
+                messagebox.showinfo("Success", "The role has been successfully edited!")
+        def delete_role(guild_id: str, role_id: str):
+            try:
+                response = delete(f"https://discord.com/api/v10/guilds/{guild_id}/roles/{role_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 200):
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 200):
+                run(connection())
+                messagebox.showinfo("Success", "The role has been successfully deleted!")
+        def add_role_member(guild_id: str, role_id: str, usr_id: str):
+            try:
+                response = put(f"https://discord.com/api/v10/guilds/{guild_id}/members/{usr_id}/roles/{role_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 204):
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                run(connection())
+                messagebox.showinfo("Success", "The role has been successfully added to the provided member!")
+        def remove_role_member(guild_id: str, role_id: str, usr_id: str):
+            try:
+                response = delete(f"https://discord.com/api/v10/guilds/{guild_id}/members/{usr_id}/roles/{role_id}", headers = {
+                    "authorization": f"Bot {login.tkn_value}"
+                })
+            except:
+                messagebox.showerror("Error", "Check your internet connection")
+            if (response.status_code != 204):
+                try:
+                    messagebox.showerror("Error", response.json()["message"])
+                except:
+                    messagebox.showerror("Error", "There was an error, try again!")
+            elif (response.status_code == 204):
+                run(connection())
+                messagebox.showinfo("Success", "The role has been successfully removed to the provided member!")
         if (choice == "Write a message"):
             post_msg(msg_textbox.get("0.0", "end"))
         elif (choice == "Edit a message"):
@@ -479,6 +714,16 @@ def program():
             ban_usr(guild_id_textbox.get(), usr_id_textbox.get())
         elif (choice == "Unban a user"):
             unban_usr(guild_id_textbox.get(), usr_id_textbox.get())
+        elif (choice == "Create a role"):
+            create_role(guild_id_textbox.get(), role_name_textbox.get())
+        elif (choice == "Edit a role"):
+            edit_role(guild_id_textbox.get(), role_id_textbox.get(), role_name_textbox.get())
+        elif (choice == "Delete a role"):
+            delete_role(guild_id_textbox.get(), role_id_textbox.get())
+        elif (choice == "Add a role to a member"):
+            add_role_member(guild_id_textbox.get(), role_id_textbox.get(), usr_id_textbox.get())
+        elif (choice == "Remove a role from a member"):
+            remove_role_member(guild_id_textbox.get(), role_id_textbox.get(), usr_id_textbox.get())
     def check_for_updates():
         if (is_alpha == True) :
             messagebox.showerror("Error", "Not allowed with alpha version")
@@ -505,7 +750,7 @@ def program():
     guild_id_label = CTkLabel(app, text="Insert guild id", font=("Arial", 16))
     guild_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     CTkLabel(app, text="Select action", font=("Arial", 16)).place(relx=0.01, rely=0.22)
-    combobox = CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user"], state="readonly", variable=StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
+    combobox = CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"], state="readonly", variable=StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.22)
     chn_type_label = CTkLabel(app, text="Select channel type", font=("Arial", 16))
     chn_type = CTkComboBox(app, values=["Text", "Voice", "Stage", "Announcement", "Forum"], state="readonly", variable=StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
@@ -523,6 +768,10 @@ def program():
     thread_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     usr_id_label = CTkLabel(app, text="Insert user id", font=("Arial", 16))
     usr_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    role_name_label = CTkLabel(app, text="Insert role name", font=("Arial", 16))
+    role_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    role_id_label = CTkLabel(app, text="Insert role id", font=("Arial", 16))
+    role_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     return app
 if __name__ == "__main__":
     login().mainloop()
