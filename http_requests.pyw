@@ -500,6 +500,8 @@ def program():
                 choice = 13
             elif (choice == "Forum"):
                 choice = 15
+            elif (choice == "Media"):
+                choice = 16
             try:
                 response = post(f"https://discord.com/api/v10/guilds/{guild_id}/channels", headers = {
                     "authorization": f"Bot {login.tkn_value}"
@@ -753,7 +755,7 @@ def program():
     combobox = CTkComboBox(app, values=["Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"], state="readonly", variable=StringVar(value="Write a message"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=combochoice)
     combobox.place(relx=0.3, rely=0.22)
     chn_type_label = CTkLabel(app, text="Select channel type", font=("Arial", 16))
-    chn_type = CTkComboBox(app, values=["Text", "Voice", "Stage", "Announcement", "Forum"], state="readonly", variable=StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
+    chn_type = CTkComboBox(app, values=["Text", "Voice", "Stage", "Announcement", "Forum", "Media"], state="readonly", variable=StringVar(value="Text"), width=250, font=("Arial", 16), dropdown_font=("Arial", 16), justify="center", command=confirm)
     msg_label = CTkLabel(app, text="Insert message", font=("Arial", 16))
     msg_label.place(relx=0.01, rely=0.35)
     msg_textbox = CTkTextbox(app, width=250, height=100, font=("Arial", 16), border_width=2)
