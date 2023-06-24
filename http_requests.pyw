@@ -1,4 +1,4 @@
-from customtkinter import set_appearance_mode, set_default_color_theme, CTkLabel, CTkEntry, CTkButton, CTk, CTkComboBox, StringVar, CTkTextbox
+from customtkinter import set_appearance_mode, set_default_color_theme, CTkLabel, CTkEntry, CTkButton, CTk, CTkComboBox, StringVar, CTkTextbox, CTkScrollableFrame
 from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
@@ -7,7 +7,7 @@ from os import environ, getenv, path, makedirs
 from asyncio import run
 from websockets.sync.client import connect
 from json import dumps
-user_version = "NineteenthRelease"
+user_version = "TwentiethRelease"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
 icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
@@ -65,6 +65,7 @@ def login():
                 messagebox.showerror("Error", response.json()["message"])
             except:
                 messagebox.showerror("Error", "There was an error, try again!")
+            return
         elif (response.status_code == 200):
             run(connection())
             messagebox.showinfo("Success", "Validation Passed!")
@@ -129,6 +130,7 @@ def program():
             msg_textbox.configure(height=100)
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place(relx=0.02, rely=0.8)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             msg_id_label.place_forget()
@@ -151,6 +153,7 @@ def program():
             chn_name_textbox.place(relx=0.3, rely=0.35)
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place_forget()
             msg_label.place_forget()
             msg_textbox.place_forget()
             msg_id_label.place_forget()
@@ -176,6 +179,7 @@ def program():
             msg_textbox.configure(height=75)
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place(relx=0.02, rely=0.8)
             chn_name_label.place_forget()
             chn_name_textbox.place_forget()
             thread_name_label.place_forget()
@@ -196,6 +200,7 @@ def program():
             msg_id_textbox.place(relx=0.3, rely=0.35)
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place(relx=0.02, rely=0.8)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
@@ -218,6 +223,7 @@ def program():
             msg_id_textbox.place(relx=0.3, rely=0.35)
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place(relx=0.02, rely=0.8)
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
@@ -241,6 +247,7 @@ def program():
         elif (choice == "Delete a channel"):
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             msg_label.place_forget()
@@ -267,6 +274,7 @@ def program():
             thread_name_textbox.place(relx=0.3, rely=0.465)
             chn_id_label.place(relx=0.01, rely=0.1)
             chn_id_textbox.place(relx=0.3, rely=0.1)
+            msg_list.place_forget()
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
@@ -289,6 +297,7 @@ def program():
             chn_type.place(relx=0.3, rely=0.35)
             chn_name_label.place(relx=0.01, rely=0.465)
             chn_name_textbox.place(relx=0.3, rely=0.48)
+            msg_list.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
@@ -309,6 +318,7 @@ def program():
             guild_id_textbox.place(relx=0.3, rely=0.1)
             usr_id_label.place(relx=0.01, rely=0.35)
             usr_id_textbox.place(relx=0.3, rely=0.35)
+            msg_list.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             msg_label.place_forget()
@@ -336,6 +346,7 @@ def program():
             guild_id_textbox.place(relx=0.3, rely=0.1)
             role_name_label.place(relx=0.01, rely=0.35)
             role_name_textbox.place(relx=0.3, rely=0.35)
+            msg_list.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
@@ -358,6 +369,7 @@ def program():
             role_id_textbox.place(relx=0.3, rely=0.35)
             role_name_label.place(relx=0.01, rely=0.465)
             role_name_textbox.place(relx=0.3, rely=0.465)
+            msg_list.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
@@ -376,6 +388,7 @@ def program():
             guild_id_textbox.place(relx=0.3, rely=0.1)
             role_id_label.place(relx=0.01, rely=0.35)
             role_id_textbox.place(relx=0.3, rely=0.35)
+            msg_list.place_forget()
             msg_id_label.place_forget()
             msg_id_textbox.place_forget()
             thread_name_label.place_forget()
@@ -398,6 +411,7 @@ def program():
             guild_id_textbox.place(relx=0.3, rely=0.1)
             usr_id_label.place(relx=0.01, rely=0.465)
             usr_id_textbox.place(relx=0.3, rely=0.465)
+            msg_list.place_forget()
             msg_label.place_forget()
             msg_textbox.place_forget()
             chn_name_label.place_forget()
@@ -430,6 +444,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully sent!")
@@ -444,6 +459,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully edited!")
@@ -456,6 +472,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully deleted!")
@@ -471,6 +488,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully pinned!")
@@ -486,6 +504,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The message has been successfully unpinned!")
@@ -516,6 +535,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 201):
                 run(connection())
                 messagebox.showinfo("Success", "The channel has been successfully created!")
@@ -533,6 +553,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The channel has been successfully edited!")
@@ -548,6 +569,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The channel has been successfully deleted!")
@@ -565,6 +587,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 201):
                 run(connection())
                 messagebox.showinfo("Success", "The thread has been successfully created!")
@@ -580,6 +603,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The user has been successfully kicked!")
@@ -595,6 +619,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The user has been successfully banned!")
@@ -610,6 +635,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The user has been successfully unbanned!")
@@ -627,6 +653,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The role has been successfully created!")
@@ -644,6 +671,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The role has been successfully edited!")
@@ -659,6 +687,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 200):
                 run(connection())
                 messagebox.showinfo("Success", "The role has been successfully deleted!")
@@ -674,6 +703,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The role has been successfully added to the provided member!")
@@ -689,6 +719,7 @@ def program():
                     messagebox.showerror("Error", response.json()["message"])
                 except:
                     messagebox.showerror("Error", "There was an error, try again!")
+                return
             elif (response.status_code == 204):
                 run(connection())
                 messagebox.showinfo("Success", "The role has been successfully removed to the provided member!")
@@ -740,6 +771,8 @@ def program():
                 open("https://github.com/LoryPelli/http_requests/releases/latest")
         else:
             messagebox.showinfo("Update", "No updates avaible!")
+    def msg_list():
+        show_msg_list(chn_id_textbox.get()).mainloop()
     CTkLabel(app, text=login.id, font=("Arial", 16)).place(relx=0.01, rely=0)
     username = CTkLabel(app, text=login.username, font=("Arial", 16))
     username.place(relx=0.6, rely=0)
@@ -764,6 +797,8 @@ def program():
     msg_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     confirm_action = CTkButton(app, text="Send", font=("Arial", 16), command=confirm)
     confirm_action.place(relx=0.4, rely=0.8)
+    msg_list = CTkButton(app, text="Show Message\nList", font=("Arial", 16), width=25, height=15, command=msg_list)
+    msg_list.place(relx=0.02, rely=0.8)
     chn_name_label = CTkLabel(app, text="Insert channel name", font=("Arial", 16))
     chn_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     thread_name_label = CTkLabel(app, text="Insert thread name", font=("Arial", 16))
@@ -774,6 +809,40 @@ def program():
     role_name_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
     role_id_label = CTkLabel(app, text="Insert role id", font=("Arial", 16))
     role_id_textbox = CTkEntry(app, width=250, height=25, font=("Arial", 16))
+    return app
+def show_msg_list(chn_id: str):
+    app = CTk()
+    app.title("msg_list")
+    app.resizable(False, False)
+    app.geometry("1000x250+750+450")
+    try:
+        app.wm_iconbitmap(icon_file)
+    except:
+        pass
+    try:
+        response = get(f"https://discord.com/api/v10/channels/{chn_id}/messages", headers = {
+            "authorization": f"Bot {login.tkn_value}"
+        })
+    except:
+        messagebox.showerror("Error", "Check your internet connection")
+    if (response.status_code != 200):
+        try:
+            messagebox.showerror("Error", response.json()["message"])
+        except:
+            messagebox.showerror("Error", "There was an error, try again!")
+        return
+    response = response.json()
+    row = 0
+    frame = CTkScrollableFrame(app, width=1000, height=250)
+    for message in reversed(response):
+        message_user = CTkLabel(frame, text=message["author"]["username"], font=("Arial", 16))
+        message_user.grid(row=row, column=0)
+        message_content = CTkLabel(frame, text=message["content"][0:110], font=("Arial", 16))
+        if (message["content"][0:110] == ""):
+            message_content.configure(text="No Content!", text_color="red")
+        message_content.grid(row=row, column=1, padx=15)
+        row += 1
+    frame.grid(row=0, column=0)
     return app
 if __name__ == "__main__":
     login().mainloop()
