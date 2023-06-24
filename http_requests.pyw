@@ -820,7 +820,7 @@ def show_msg_list(chn_id: str):
     except:
         pass
     try:
-        response = get(f"https://discord.com/api/v10/channels/{chn_id}/messages", headers = {
+        response = get(f"https://discord.com/api/v10/channels/{chn_id}/messages?limit=100", headers = {
             "authorization": f"Bot {login.tkn_value}"
         })
     except:
@@ -839,7 +839,7 @@ def show_msg_list(chn_id: str):
         message_user.grid(row=row, column=0)
         message_content = CTkLabel(frame, text=message["content"][0:110], font=("Arial", 16))
         if (message["content"][0:110] == ""):
-            message_content.configure(text="No Content!", text_color="red")
+            message_content.configure(text="No Content!", text_color="red", font=("Arial", 16, "italic"))
         message_content.grid(row=row, column=1, padx=15)
         row += 1
     frame.grid(row=0, column=0)
