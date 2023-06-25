@@ -814,7 +814,7 @@ def show_msg_list(chn_id: str):
     app = CTk()
     app.title("msg_list")
     app.resizable(False, False)
-    app.geometry("1000x250+750+450")
+    app.geometry("1000x260+750+450")
     try:
         app.wm_iconbitmap(icon_file)
     except:
@@ -838,6 +838,11 @@ def show_msg_list(chn_id: str):
         message_user = CTkLabel(frame, text=message["author"]["username"], font=("Arial", 16))
         message_user.grid(row=row, column=0)
         message_content = CTkLabel(frame, text=message["content"][0:110], font=("Arial", 16))
+        if (len(message["content"]) > 110):
+            strings_array = []
+            for i in range(0, len(message["content"]), 110):
+                strings_array.append(message["content"][i:i + 110])
+            message_content = CTkLabel(frame, text="\n".join(strings_array), font=("Arial", 16))
         if (message["content"][0:110] == ""):
             message_content.configure(text="No Content!", text_color="red", font=("Arial", 16, "italic"))
         message_content.grid(row=row, column=1, padx=15)
