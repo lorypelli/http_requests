@@ -3,15 +3,21 @@ from tkinter import messagebox
 from requests import get, post, delete, patch, put
 from webbrowser import open
 from urllib import request
-from os import environ, getenv, path, makedirs
+from os import environ, getenv, path, makedirs, name, getlogin
 from asyncio import run
 from websockets.sync.client import connect
 from json import dumps
-user_version = "TwentiethRelease"
+user_version = "2.5.1"
 is_alpha = False
 icon_url = "https://raw.githubusercontent.com/LoryPelli/http_requests/main/app_icon.ico"
-icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
-icon_file = f"{icon_directory}/app_icon.ico"
+if (name == "nt"):
+    icon_directory = f"{environ.get('SystemDrive')}/Users/{getenv('Username')}/http_requests"
+else:
+    icon_directory = f"{path.expanduser('~' + getlogin())}/http_requests"
+if (name == "nt"):
+    icon_file = f"{icon_directory}/app_icon.ico"
+else:
+    icon_file = f"{icon_directory}/app_icon.png"
 set_appearance_mode("System")
 set_default_color_theme("dark-blue")
 if (not(path.exists(icon_directory))):
