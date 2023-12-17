@@ -304,7 +304,7 @@ func main() {
 								j.Unmarshal(bytes, &body)
 								dialog.ShowInformation("Error", body.Message, program)
 							} else {
-								dialog.ShowInformation("Success", "The message has been successfully unpinned!", program)
+								dialog.ShowInformation("Success", "The channel has been successfully created!", program)
 							}
 						}
 						break
