@@ -121,12 +121,39 @@ func main() {
 						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_textbox, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"content": msg_textbox.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id_textbox.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Set("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 200 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The message has been successfully sent!", program)
+							}
+						}
 						break
 					}
 				case "Edit a message":
 					{
 						msg_id_textbox := widget.NewEntry()
 						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						program.Resize(fyne.NewSize(400, 270))
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -135,7 +162,6 @@ func main() {
 								}
 							}, program)
 						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, msg_textbox, confirm_action)))
-						program.Resize(fyne.NewSize(400, 270))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
