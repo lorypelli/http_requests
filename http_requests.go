@@ -20,7 +20,7 @@ func main() {
 	a := app.New()
 	login := a.NewWindow("Login")
 	program := a.NewWindow("http_requests")
-	fileName := "app_icon.png"
+	fileName := "icon.png"
 	file, err := os.Open(fileName)
 	if err == nil {
 		stats, _ := os.Stat(fileName)
