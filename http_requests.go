@@ -76,6 +76,20 @@ func main() {
 			botId := body.Id
 			botUsername := body.Username
 			login.Hide()
+			show := false
+			program.SetCloseIntercept(func() {
+				if (!show) {
+					dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+						if b {
+							login.Show()
+							program.Hide()
+						} else {
+							show = false
+						}
+					}, program)
+					show = true
+				}
+			})
 			chn_id_textbox := widget.NewEntry()
 			chn_id_textbox.SetPlaceHolder("Insert channel ID")
 			msg_textbox := widget.NewMultiLineEntry()
