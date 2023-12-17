@@ -78,8 +78,6 @@ func main() {
 			login.Hide()
 			chn_textbox := widget.NewEntry()
 			chn_textbox.SetPlaceHolder("Insert channel ID")
-			combobox := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, func(s string) {})
-			combobox.SetSelected("Write a message")
 			msg_textbox := widget.NewMultiLineEntry()
 			msg_textbox.SetPlaceHolder("Insert message")
 			confirm_action := widget.NewButton("Send", func() {
@@ -108,6 +106,96 @@ func main() {
 					dialog.ShowInformation("Success", "The message has been successfully sent!", program)
 				}
 			})
+			combobox := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, func(s string) {
+				switch s {
+				case "Write a message":
+					{
+						confirm_action.SetText("Send")
+						break
+					}
+				case "Edit a message":
+					{
+						confirm_action.SetText("Edit")
+						break
+					}
+				case "Pin a message":
+					{
+						confirm_action.SetText("Pin")
+						break
+					}
+				case "Create a channel":
+					{
+						confirm_action.SetText("Create")
+						break
+					}
+				case "Edit a channel":
+					{
+						confirm_action.SetText("Edit")
+						break
+					}
+				case "Create a thread":
+					{
+						confirm_action.SetText("Create")
+						break
+					}
+				case "Delete a channel":
+					{
+						confirm_action.SetText("Delete")
+						break
+					}
+				case "Delete a message":
+					{
+						confirm_action.SetText("Delete")
+						break
+					}
+				case "Unpin a message":
+					{
+						confirm_action.SetText("Unpin")
+						break
+					}
+				case "Kick a user":
+					{
+						confirm_action.SetText("Kick")
+						break
+					}
+				case "Ban a user":
+					{
+						confirm_action.SetText("Ban")
+						break
+					}
+				case "Unban a user":
+					{
+						confirm_action.SetText("Unban")
+						break
+					}
+				case "Create a role":
+					{
+						confirm_action.SetText("Create")
+						break
+					}
+				case "Edit a role":
+					{
+						confirm_action.SetText("Edit")
+						break
+					}
+				case "Delete a role":
+					{
+						confirm_action.SetText("Delete")
+						break
+					}
+				case "Add a role to a member":
+					{
+						confirm_action.SetText("Add")
+						break
+					}
+				case "Remove a role from a member":
+					{
+						confirm_action.SetText("Remove")
+						break
+					}
+				}
+			})
+			combobox.SetSelected("Write a message")
 			program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 					if b {
