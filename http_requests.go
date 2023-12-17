@@ -78,7 +78,7 @@ func main() {
 			login.Hide()
 			show := false
 			program.SetCloseIntercept(func() {
-				if (!show) {
+				if !show {
 					dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 						if b {
 							login.Show()
@@ -396,7 +396,46 @@ func main() {
 					}
 				case "Create a thread":
 					{
+						msg_id_textbox := widget.NewEntry()
+						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						thread_name := widget.NewEntry()
+						thread_name.SetPlaceHolder("Insert thread name")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, thread_name, confirm_action)))
+						program.Resize(fyne.NewSize(400, 220))
 						confirm_action.SetText("Create")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"name": thread_name.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s/threads", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Set("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 201 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The thread has been successfully created!", program)
+							}
+						}
 						break
 					}
 				case "Delete a channel":
