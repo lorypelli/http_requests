@@ -261,46 +261,90 @@ func main() {
 						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, chn_type, chn_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Create")
-						choice := 0
-						switch chn_type.Selected {
-						case "Text":
-							{
-								choice = 0
-								break
+						chn_type.OnChanged = func(s string) {
+							choice := 0
+							switch chn_type.Selected {
+							case "Text":
+								{
+									choice = 0
+									break
+								}
+							case "Voice":
+								{
+									choice = 2
+									break
+								}
+							case "Announcement":
+								{
+									choice = 5
+									break
+								}
+							case "Stage":
+								{
+									choice = 13
+									break
+								}
+							case "Forum":
+								{
+									choice = 15
+									break
+								}
+							case "Media":
+								{
+									choice = 16
+									break
+								}
 							}
-						case "Voice":
-							{
-								choice = 2
-								break
-							}
-						case "Announcement":
-							{
-								choice = 5
-								break
-							}
-						case "Stage":
-							{
-								choice = 13
-								break
-							}
-						case "Forum":
-							{
-								choice = 15
-								break
-							}
-						case "Media":
-							{
-								choice = 16
-								break
+							confirm_action.OnTapped = func() {
+								body := map[string]interface{}{
+									"name": chn_name.Text,
+									"type": choice,
+								}
+								json, _ := j.Marshal(body)
+								req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id_textbox.Text), b.NewBuffer(json))
+								if err != nil {
+									dialog.ShowError(err, program)
+								}
+								req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+								req.Header.Set("Content-Type", "application/json")
+								c := &http.Client{}
+								res, err := c.Do(req)
+								if err != nil {
+									dialog.ShowError(err, program)
+								} else if res.StatusCode != 201 {
+									var body struct {
+										Message string
+									}
+									bytes, _ := io.ReadAll(res.Body)
+									j.Unmarshal(bytes, &body)
+									dialog.ShowInformation("Error", body.Message, program)
+								} else {
+									dialog.ShowInformation("Success", "The channel has been successfully created!", program)
+								}
 							}
 						}
+						break
+					}
+				case "Edit a channel":
+					{
+						chn_name := widget.NewEntry()
+						chn_name.SetPlaceHolder("Insert channel name")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, chn_name, confirm_action)))
+						program.Resize(fyne.NewSize(400, 240))
+						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
 								"name": chn_name.Text,
-								"type": choice,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id_textbox.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
@@ -310,7 +354,7 @@ func main() {
 							res, err := c.Do(req)
 							if err != nil {
 								dialog.ShowError(err, program)
-							} else if res.StatusCode != 201 {
+							} else if res.StatusCode != 200 {
 								var body struct {
 									Message string
 								}
@@ -318,14 +362,9 @@ func main() {
 								j.Unmarshal(bytes, &body)
 								dialog.ShowInformation("Error", body.Message, program)
 							} else {
-								dialog.ShowInformation("Success", "The channel has been successfully created!", program)
+								dialog.ShowInformation("Success", "The channel has been successfully edited!", program)
 							}
 						}
-						break
-					}
-				case "Edit a channel":
-					{
-						confirm_action.SetText("Edit")
 						break
 					}
 				case "Create a thread":
