@@ -106,8 +106,8 @@ func main() {
 					dialog.ShowInformation("Success", "The message has been successfully sent!", program)
 				}
 			})
-			combobox := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, nil)
-			combobox.OnChanged = func(s string) {
+			actions := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, nil)
+			actions.OnChanged = func(s string) {
 				switch s {
 				case "Write a message":
 					{
@@ -118,7 +118,7 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_textbox, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
 						confirm_action.OnTapped = func() {
@@ -161,7 +161,7 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, msg_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, msg_textbox, confirm_action)))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
@@ -202,15 +202,11 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Pin")
 						confirm_action.OnTapped = func() {
-							body := map[string]interface{}{
-								"content": msg_textbox.Text,
-							}
-							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
@@ -235,7 +231,48 @@ func main() {
 					}
 				case "Create a channel":
 					{
+						guild_id_textbox := widget.NewEntry()
+						guild_id_textbox.SetPlaceHolder("Insert guild ID")
+						chn_type := widget.NewSelect([]string{"Text", "Voice", "Stage", "Announcement", "Forum", "Media"}, func(s string) {})
+						chn_type.SetSelected("Text")
+						chn_name := widget.NewEntry()
+						chn_name.SetPlaceHolder("Insert channel name")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, chn_type, chn_name, confirm_action)))
+						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Create")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"content": msg_textbox.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", chn_id_textbox.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Set("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The message has been successfully unpinned!", program)
+							}
+						}
 						break
 					}
 				case "Edit a channel":
@@ -269,15 +306,11 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Unpin")
 						confirm_action.OnTapped = func() {
-							body := map[string]interface{}{
-								"content": msg_textbox.Text,
-							}
-							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
@@ -342,7 +375,7 @@ func main() {
 					}
 				}
 			}
-			combobox.SetSelected("Write a message")
+			actions.SetSelected("Write a message")
 			program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 					if b {
@@ -350,7 +383,7 @@ func main() {
 						program.Hide()
 					}
 				}, program)
-			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_textbox, confirm_action)))
+			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_textbox, confirm_action)))
 			program.Show()
 		}
 	})))
