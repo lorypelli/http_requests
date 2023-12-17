@@ -1,7 +1,8 @@
 package main
 
 import (
-	"encoding/json"
+	b "bytes"
+	j "encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -31,7 +32,7 @@ func main() {
 		program.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 	}
 	login.Resize(fyne.NewSize(840, 170))
-	program.Resize(fyne.NewSize(500, 250))
+	program.Resize(fyne.NewSize(500, 240))
 	login.SetFixedSize(true)
 	program.SetFixedSize(true)
 	login.CenterOnScreen()
@@ -53,7 +54,7 @@ func main() {
 				Message string
 			}
 			bytes, _ := io.ReadAll(res.Body)
-			json.Unmarshal(bytes, &body)
+			j.Unmarshal(bytes, &body)
 			dialog.ShowInformation("Error", body.Message, login)
 		} else {
 			req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
@@ -71,10 +72,42 @@ func main() {
 				Username string
 			}
 			bytes, _ := io.ReadAll(res.Body)
-			json.Unmarshal(bytes, &body)
+			j.Unmarshal(bytes, &body)
 			botId := body.Id
 			botUsername := body.Username
 			login.Hide()
+			chn_textbox := widget.NewEntry()
+			chn_textbox.SetPlaceHolder("Insert channel ID")
+			combobox := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, func(s string) {})
+			combobox.SetSelected("Write a message")
+			msg_textbox := widget.NewMultiLineEntry()
+			msg_textbox.SetPlaceHolder("Insert message")
+			confirm_action := widget.NewButton("Send", func() {
+				body := map[string]interface{}{
+					"content": msg_textbox.Text,
+				}
+				json, _ := j.Marshal(body)
+				req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_textbox.Text), b.NewBuffer(json))
+				if err != nil {
+					dialog.ShowError(err, program)
+				}
+				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+				req.Header.Set("Content-Type", "application/json")
+				c := &http.Client{}
+				res, err := c.Do(req)
+				if err != nil {
+					dialog.ShowError(err, program)
+				} else if res.StatusCode != 200 {
+					var body struct {
+						Message string
+					}
+					bytes, _ := io.ReadAll(res.Body)
+					j.Unmarshal(bytes, &body)
+					dialog.ShowInformation("Error", body.Message, program)
+				} else {
+					dialog.ShowInformation("Success", "The message has been successfully sent!", program)
+				}
+			})
 			program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 					if b {
@@ -82,7 +115,7 @@ func main() {
 						program.Hide()
 					}
 				}, program)
-			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil))
+			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_textbox, combobox, msg_textbox, confirm_action)))
 			program.Show()
 		}
 	})))
