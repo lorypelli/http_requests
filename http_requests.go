@@ -31,8 +31,8 @@ func main() {
 		login.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 		program.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 	}
-	login.Resize(fyne.NewSize(840, 170))
-	program.Resize(fyne.NewSize(500, 240))
+	login.Resize(fyne.NewSize(640, 170))
+	program.Resize(fyne.NewSize(400, 240))
 	login.SetFixedSize(true)
 	program.SetFixedSize(true)
 	login.CenterOnScreen()
@@ -76,8 +76,8 @@ func main() {
 			botId := body.Id
 			botUsername := body.Username
 			login.Hide()
-			chn_textbox := widget.NewEntry()
-			chn_textbox.SetPlaceHolder("Insert channel ID")
+			chn_id_textbox := widget.NewEntry()
+			chn_id_textbox.SetPlaceHolder("Insert channel ID")
 			msg_textbox := widget.NewMultiLineEntry()
 			msg_textbox.SetPlaceHolder("Insert message")
 			confirm_action := widget.NewButton("Send", func() {
@@ -85,7 +85,7 @@ func main() {
 					"content": msg_textbox.Text,
 				}
 				json, _ := j.Marshal(body)
-				req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_textbox.Text), b.NewBuffer(json))
+				req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id_textbox.Text), b.NewBuffer(json))
 				if err != nil {
 					dialog.ShowError(err, program)
 				}
@@ -106,16 +106,63 @@ func main() {
 					dialog.ShowInformation("Success", "The message has been successfully sent!", program)
 				}
 			})
-			combobox := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, func(s string) {
+			combobox := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, nil)
+			combobox.OnChanged = func(s string) {
 				switch s {
 				case "Write a message":
 					{
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_textbox, confirm_action)))
+						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
 						break
 					}
 				case "Edit a message":
 					{
+						msg_id_textbox := widget.NewEntry()
+						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, msg_textbox, confirm_action)))
+						program.Resize(fyne.NewSize(400, 270))
 						confirm_action.SetText("Edit")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"content": msg_textbox.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Set("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 200 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The message has been successfully edited!", program)
+							}
+						}
 						break
 					}
 				case "Pin a message":
@@ -194,7 +241,7 @@ func main() {
 						break
 					}
 				}
-			})
+			}
 			combobox.SetSelected("Write a message")
 			program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
@@ -203,7 +250,7 @@ func main() {
 						program.Hide()
 					}
 				}, program)
-			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_textbox, combobox, msg_textbox, confirm_action)))
+			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_textbox, confirm_action)))
 			program.Show()
 		}
 	})))
