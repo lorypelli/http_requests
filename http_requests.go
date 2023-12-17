@@ -247,12 +247,46 @@ func main() {
 						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, chn_type, chn_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Create")
+						choice := 0
+						switch chn_type.Selected {
+						case "Text":
+							{
+								choice = 0
+								break
+							}
+						case "Voice":
+							{
+								choice = 2
+								break
+							}
+						case "Announcement":
+							{
+								choice = 5
+								break
+							}
+						case "Stage":
+							{
+								choice = 13
+								break
+							}
+						case "Forum":
+							{
+								choice = 15
+								break
+							}
+						case "Media":
+							{
+								choice = 16
+								break
+							}
+						}
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
-								"content": msg_textbox.Text,
+								"name": chn_name.Text,
+								"type": choice,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", chn_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id_textbox.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
@@ -262,7 +296,7 @@ func main() {
 							res, err := c.Do(req)
 							if err != nil {
 								dialog.ShowError(err, program)
-							} else if res.StatusCode != 204 {
+							} else if res.StatusCode != 201 {
 								var body struct {
 									Message string
 								}
