@@ -193,7 +193,44 @@ func main() {
 					}
 				case "Pin a message":
 					{
+						msg_id_textbox := widget.NewEntry()
+						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Pin")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"content": msg_textbox.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Set("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The message has been successfully pinned!", program)
+							}
+						}
 						break
 					}
 				case "Create a channel":
@@ -223,7 +260,44 @@ func main() {
 					}
 				case "Unpin a message":
 					{
+						msg_id_textbox := widget.NewEntry()
+						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, combobox, msg_id_textbox, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Unpin")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"content": msg_textbox.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Set("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The message has been successfully unpinned!", program)
+							}
+						}
 						break
 					}
 				case "Kick a user":
