@@ -743,7 +743,7 @@ func main() {
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Delete")
 						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guild/%s/roles/%s", guild_id.Text, role_id.Text), nil)
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/roles/%s", guild_id.Text, role_id.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
@@ -752,7 +752,7 @@ func main() {
 							res, err := c.Do(req)
 							if err != nil {
 								dialog.ShowError(err, program)
-							} else if res.StatusCode != 200 {
+							} else if res.StatusCode != 204 {
 								var body struct {
 									Message string
 								}
@@ -767,12 +767,72 @@ func main() {
 					}
 				case "Add a role to a member":
 					{
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, role_id, confirm_action)))
+						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Add")
+						confirm_action.OnTapped = func() {
+							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/members/%s/roles/%s", guild_id.Text, usr_id.Text, role_id.Text), nil)
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The role has been successfully added to the provided member!", program)
+							}
+						}
 						break
 					}
 				case "Remove a role from a member":
 					{
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, role_id, confirm_action)))
+						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Remove")
+						confirm_action.OnTapped = func() {
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/members/%s/roles/%s", guild_id.Text, usr_id.Text, role_id.Text), nil)
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The role has been successfully removed from the provided member!", program)
+							}
+						}
 						break
 					}
 				}
