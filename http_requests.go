@@ -94,6 +94,22 @@ func main() {
 			chn_id.SetPlaceHolder("Insert channel ID")
 			msg := widget.NewMultiLineEntry()
 			msg.SetPlaceHolder("Insert message")
+			msg_id := widget.NewEntry()
+			msg_id.SetPlaceHolder("Insert message ID")
+			guild_id := widget.NewEntry()
+			guild_id.SetPlaceHolder("Insert guild ID")
+			chn_type := widget.NewSelect([]string{"Text", "Voice", "Stage", "Announcement", "Forum", "Media"}, func(s string) {})
+			chn_type.SetSelected("Text")
+			chn_name := widget.NewEntry()
+			chn_name.SetPlaceHolder("Insert channel name")
+			usr_id := widget.NewEntry()
+			usr_id.SetPlaceHolder("Insert user ID")
+			thread_name := widget.NewEntry()
+			thread_name.SetPlaceHolder("Insert thread name")
+			role_id := widget.NewEntry()
+			role_id.SetPlaceHolder("Insert role ID")
+			role_name := widget.NewEntry()
+			role_name.SetPlaceHolder("Insert role name")
 			confirm_action := widget.NewButton("Send", func() {
 				body := map[string]interface{}{
 					"content": msg.Text,
@@ -165,8 +181,6 @@ func main() {
 					}
 				case "Edit a message":
 					{
-						msg_id := widget.NewEntry()
-						msg_id.SetPlaceHolder("Insert message ID")
 						program.Resize(fyne.NewSize(400, 270))
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
@@ -207,8 +221,6 @@ func main() {
 					}
 				case "Pin a message":
 					{
-						msg_id := widget.NewEntry()
-						msg_id.SetPlaceHolder("Insert message ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -244,12 +256,6 @@ func main() {
 					}
 				case "Create a channel":
 					{
-						guild_id := widget.NewEntry()
-						guild_id.SetPlaceHolder("Insert guild ID")
-						chn_type := widget.NewSelect([]string{"Text", "Voice", "Stage", "Announcement", "Forum", "Media"}, func(s string) {})
-						chn_type.SetSelected("Text")
-						chn_name := widget.NewEntry()
-						chn_name.SetPlaceHolder("Insert channel name")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -353,8 +359,6 @@ func main() {
 					}
 				case "Edit a channel":
 					{
-						chn_name := widget.NewEntry()
-						chn_name.SetPlaceHolder("Insert channel name")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -363,7 +367,7 @@ func main() {
 								}
 							}, program)
 						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, chn_name, confirm_action)))
-						program.Resize(fyne.NewSize(400, 240))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
@@ -395,10 +399,6 @@ func main() {
 					}
 				case "Create a thread":
 					{
-						msg_id := widget.NewEntry()
-						msg_id.SetPlaceHolder("Insert message ID")
-						thread_name := widget.NewEntry()
-						thread_name.SetPlaceHolder("Insert thread name")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -473,8 +473,6 @@ func main() {
 					}
 				case "Delete a message":
 					{
-						msg_id := widget.NewEntry()
-						msg_id.SetPlaceHolder("Insert message ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -514,8 +512,6 @@ func main() {
 					}
 				case "Unpin a message":
 					{
-						msg_id := widget.NewEntry()
-						msg_id.SetPlaceHolder("Insert message ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -551,10 +547,6 @@ func main() {
 					}
 				case "Kick a user":
 					{
-						guild_id := widget.NewEntry()
-						guild_id.SetPlaceHolder("Insert guild ID")
-						usr_id := widget.NewEntry()
-						usr_id.SetPlaceHolder("Insert user ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -590,10 +582,6 @@ func main() {
 					}
 				case "Ban a user":
 					{
-						guild_id := widget.NewEntry()
-						guild_id.SetPlaceHolder("Insert guild ID")
-						usr_id := widget.NewEntry()
-						usr_id.SetPlaceHolder("Insert user ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -629,10 +617,6 @@ func main() {
 					}
 				case "Unban a user":
 					{
-						guild_id := widget.NewEntry()
-						guild_id.SetPlaceHolder("Insert guild ID")
-						usr_id := widget.NewEntry()
-						usr_id.SetPlaceHolder("Insert user ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -668,10 +652,6 @@ func main() {
 					}
 				case "Create a role":
 					{
-						guild_id := widget.NewEntry()
-						guild_id.SetPlaceHolder("Insert guild ID")
-						role_name := widget.NewEntry()
-						role_name.SetPlaceHolder("Insert role name")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -712,12 +692,77 @@ func main() {
 					}
 				case "Edit a role":
 					{
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, role_id, role_name, confirm_action)))
+						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Edit")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"name": role_name.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/roles/%s", guild_id.Text, role_id.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 200 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The role has been successfully edited!", program)
+							}
+						}
 						break
 					}
 				case "Delete a role":
 					{
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, role_id, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Delete")
+						confirm_action.OnTapped = func() {
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guild/%s/roles/%s", guild_id.Text, role_id.Text), nil)
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 200 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The role has been successfully deleted!", program)
+							}
+						}
 						break
 					}
 				case "Add a role to a member":
