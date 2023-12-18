@@ -31,13 +31,13 @@ func main() {
 		login.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 		program.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 	}
-	login.Resize(fyne.NewSize(640, 170))
+	login.Resize(fyne.NewSize(670, 170))
 	program.Resize(fyne.NewSize(400, 240))
 	login.SetFixedSize(true)
 	program.SetFixedSize(true)
 	login.CenterOnScreen()
 	program.CenterOnScreen()
-	tkn_textbox := widget.NewEntry()
+	tkn_textbox := widget.NewPasswordEntry()
 	tkn_textbox.SetPlaceHolder("Insert bot token")
 	login.SetContent(container.NewVBox(tkn_textbox, widget.NewButton("Validate", func() {
 		req, err := http.NewRequest("POST", "https://discord.com/api/v10/auth/login", nil)
