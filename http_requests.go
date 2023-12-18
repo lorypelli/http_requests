@@ -37,14 +37,14 @@ func main() {
 	program.SetFixedSize(true)
 	login.CenterOnScreen()
 	program.CenterOnScreen()
-	tkn_textbox := widget.NewPasswordEntry()
-	tkn_textbox.SetPlaceHolder("Insert bot token")
-	login.SetContent(container.NewVBox(tkn_textbox, widget.NewButton("Validate", func() {
+	tkn := widget.NewPasswordEntry()
+	tkn.SetPlaceHolder("Insert bot token")
+	login.SetContent(container.NewVBox(tkn, widget.NewButton("Validate", func() {
 		req, err := http.NewRequest("POST", "https://discord.com/api/v10/auth/login", nil)
 		if err != nil {
 			dialog.ShowError(err, login)
 		}
-		req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+		req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 		c := &http.Client{}
 		res, err := c.Do(req)
 		if err != nil {
@@ -61,7 +61,7 @@ func main() {
 			if err != nil {
 				dialog.ShowError(err, login)
 			}
-			req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+			req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 			c := &http.Client{}
 			res, err := c.Do(req)
 			if err != nil {
@@ -90,21 +90,21 @@ func main() {
 					show = true
 				}
 			})
-			chn_id_textbox := widget.NewEntry()
-			chn_id_textbox.SetPlaceHolder("Insert channel ID")
-			msg_textbox := widget.NewMultiLineEntry()
-			msg_textbox.SetPlaceHolder("Insert message")
+			chn_id := widget.NewEntry()
+			chn_id.SetPlaceHolder("Insert channel ID")
+			msg := widget.NewMultiLineEntry()
+			msg.SetPlaceHolder("Insert message")
 			confirm_action := widget.NewButton("Send", func() {
 				body := map[string]interface{}{
-					"content": msg_textbox.Text,
+					"content": msg.Text,
 				}
 				json, _ := j.Marshal(body)
-				req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id_textbox.Text), b.NewBuffer(json))
+				req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id.Text), b.NewBuffer(json))
 				if err != nil {
 					dialog.ShowError(err, program)
 				}
-				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-				req.Header.Set("Content-Type", "application/json")
+				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+				req.Header.Add("Content-Type", "application/json")
 				c := &http.Client{}
 				res, err := c.Do(req)
 				if err != nil {
@@ -132,20 +132,20 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
-								"content": msg_textbox.Text,
+								"content": msg.Text,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -165,8 +165,8 @@ func main() {
 					}
 				case "Edit a message":
 					{
-						msg_id_textbox := widget.NewEntry()
-						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						msg_id := widget.NewEntry()
+						msg_id.SetPlaceHolder("Insert message ID")
 						program.Resize(fyne.NewSize(400, 270))
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
@@ -175,19 +175,19 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, msg_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, msg, confirm_action)))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
-								"content": msg_textbox.Text,
+								"content": msg.Text,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s", chn_id.Text, msg_id.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -207,8 +207,8 @@ func main() {
 					}
 				case "Pin a message":
 					{
-						msg_id_textbox := widget.NewEntry()
-						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						msg_id := widget.NewEntry()
+						msg_id.SetPlaceHolder("Insert message ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -216,15 +216,15 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Pin")
 						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), nil)
+							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id.Text, msg_id.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -244,8 +244,8 @@ func main() {
 					}
 				case "Create a channel":
 					{
-						guild_id_textbox := widget.NewEntry()
-						guild_id_textbox.SetPlaceHolder("Insert guild ID")
+						guild_id := widget.NewEntry()
+						guild_id.SetPlaceHolder("Insert guild ID")
 						chn_type := widget.NewSelect([]string{"Text", "Voice", "Stage", "Announcement", "Forum", "Media"}, func(s string) {})
 						chn_type.SetSelected("Text")
 						chn_name := widget.NewEntry()
@@ -257,7 +257,7 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, chn_type, chn_name, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, chn_type, chn_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Create")
 						confirm_action.OnTapped = func() {
@@ -266,12 +266,12 @@ func main() {
 								"type": 0,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -327,12 +327,12 @@ func main() {
 									"type": choice,
 								}
 								json, _ := j.Marshal(body)
-								req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id_textbox.Text), b.NewBuffer(json))
+								req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/channels", guild_id.Text), b.NewBuffer(json))
 								if err != nil {
 									dialog.ShowError(err, program)
 								}
-								req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-								req.Header.Set("Content-Type", "application/json")
+								req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+								req.Header.Add("Content-Type", "application/json")
 								c := &http.Client{}
 								res, err := c.Do(req)
 								if err != nil {
@@ -362,7 +362,7 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, chn_name, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, chn_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
@@ -370,12 +370,12 @@ func main() {
 								"name": chn_name.Text,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -395,8 +395,8 @@ func main() {
 					}
 				case "Create a thread":
 					{
-						msg_id_textbox := widget.NewEntry()
-						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						msg_id := widget.NewEntry()
+						msg_id.SetPlaceHolder("Insert message ID")
 						thread_name := widget.NewEntry()
 						thread_name.SetPlaceHolder("Insert thread name")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
@@ -406,7 +406,7 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, thread_name, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, thread_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 220))
 						confirm_action.SetText("Create")
 						confirm_action.OnTapped = func() {
@@ -414,12 +414,12 @@ func main() {
 								"name": thread_name.Text,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s/threads", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s/threads", chn_id.Text, msg_id.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -446,15 +446,15 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, confirm_action)))
 						program.Resize(fyne.NewSize(400, 150))
 						confirm_action.SetText("Delete")
 						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id_textbox.Text), nil)
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -473,8 +473,8 @@ func main() {
 					}
 				case "Delete a message":
 					{
-						msg_id_textbox := widget.NewEntry()
-						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						msg_id := widget.NewEntry()
+						msg_id.SetPlaceHolder("Insert message ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -482,19 +482,19 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Delete")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
-								"content": msg_textbox.Text,
+								"content": msg.Text,
 							}
 							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s", chn_id_textbox.Text, msg_id_textbox.Text), b.NewBuffer(json))
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s", chn_id.Text, msg_id.Text), b.NewBuffer(json))
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -514,8 +514,8 @@ func main() {
 					}
 				case "Unpin a message":
 					{
-						msg_id_textbox := widget.NewEntry()
-						msg_id_textbox.SetPlaceHolder("Insert message ID")
+						msg_id := widget.NewEntry()
+						msg_id.SetPlaceHolder("Insert message ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -523,15 +523,15 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Unpin")
 						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id_textbox.Text, msg_id_textbox.Text), nil)
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id.Text, msg_id.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -551,10 +551,10 @@ func main() {
 					}
 				case "Kick a user":
 					{
-						guild_id_textbox := widget.NewEntry()
-						guild_id_textbox.SetPlaceHolder("Insert guild ID")
-						usr_id_textbox := widget.NewEntry()
-						usr_id_textbox.SetPlaceHolder("Insert user ID")
+						guild_id := widget.NewEntry()
+						guild_id.SetPlaceHolder("Insert guild ID")
+						usr_id := widget.NewEntry()
+						usr_id.SetPlaceHolder("Insert user ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -562,15 +562,15 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, usr_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Kick")
 						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/members/%s", guild_id_textbox.Text, usr_id_textbox.Text), nil)
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/members/%s", guild_id.Text, usr_id.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -590,10 +590,10 @@ func main() {
 					}
 				case "Ban a user":
 					{
-						guild_id_textbox := widget.NewEntry()
-						guild_id_textbox.SetPlaceHolder("Insert guild ID")
-						usr_id_textbox := widget.NewEntry()
-						usr_id_textbox.SetPlaceHolder("Insert user ID")
+						guild_id := widget.NewEntry()
+						guild_id.SetPlaceHolder("Insert guild ID")
+						usr_id := widget.NewEntry()
+						usr_id.SetPlaceHolder("Insert user ID")
 						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
 							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
 								if b {
@@ -601,15 +601,15 @@ func main() {
 									program.Hide()
 								}
 							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, usr_id_textbox, confirm_action)))
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Ban")
 						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/bans/%s", guild_id_textbox.Text, usr_id_textbox.Text), nil)
+							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/bans/%s", guild_id.Text, usr_id.Text), nil)
 							if err != nil {
 								dialog.ShowError(err, program)
 							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -629,12 +629,85 @@ func main() {
 					}
 				case "Unban a user":
 					{
+						guild_id := widget.NewEntry()
+						guild_id.SetPlaceHolder("Insert guild ID")
+						usr_id := widget.NewEntry()
+						usr_id.SetPlaceHolder("Insert user ID")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Unban")
+						confirm_action.OnTapped = func() {
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/bans/%s", guild_id.Text, usr_id.Text), nil)
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The user has been successfully unbanned!", program)
+							}
+						}
 						break
 					}
 				case "Create a role":
 					{
+						guild_id := widget.NewEntry()
+						guild_id.SetPlaceHolder("Insert guild ID")
+						role_name := widget.NewEntry()
+						role_name.SetPlaceHolder("Insert role name")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, role_name, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Create")
+						confirm_action.OnTapped = func() {
+							body := map[string]interface{}{
+								"name": role_name.Text,
+							}
+							json, _ := j.Marshal(body)
+							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/roles", guild_id.Text), b.NewBuffer(json))
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+							req.Header.Add("Content-Type", "application/json")
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 200 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The role has been successfully created!", program)
+							}
+						}
 						break
 					}
 				case "Edit a role":
@@ -667,7 +740,7 @@ func main() {
 						program.Hide()
 					}
 				}, program)
-			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id_textbox, actions, msg_textbox, confirm_action)))
+			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 			program.Show()
 		}
 	})))
