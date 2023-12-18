@@ -225,7 +225,6 @@ func main() {
 								dialog.ShowError(err, program)
 							}
 							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -456,7 +455,6 @@ func main() {
 								dialog.ShowError(err, program)
 							}
 							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -497,7 +495,6 @@ func main() {
 								dialog.ShowError(err, program)
 							}
 							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -535,7 +532,6 @@ func main() {
 								dialog.ShowError(err, program)
 							}
 							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
-							req.Header.Set("Content-Type", "application/json")
 							c := &http.Client{}
 							res, err := c.Do(req)
 							if err != nil {
@@ -555,12 +551,80 @@ func main() {
 					}
 				case "Kick a user":
 					{
+						guild_id_textbox := widget.NewEntry()
+						guild_id_textbox.SetPlaceHolder("Insert guild ID")
+						usr_id_textbox := widget.NewEntry()
+						usr_id_textbox.SetPlaceHolder("Insert user ID")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, usr_id_textbox, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Kick")
+						confirm_action.OnTapped = func() {
+							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/members/%s", guild_id_textbox.Text, usr_id_textbox.Text), nil)
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The user has been successfully kicked!", program)
+							}
+						}
 						break
 					}
 				case "Ban a user":
 					{
+						guild_id_textbox := widget.NewEntry()
+						guild_id_textbox.SetPlaceHolder("Insert guild ID")
+						usr_id_textbox := widget.NewEntry()
+						usr_id_textbox.SetPlaceHolder("Insert user ID")
+						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
+							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+								if b {
+									login.Show()
+									program.Hide()
+								}
+							}, program)
+						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id_textbox, actions, usr_id_textbox, confirm_action)))
+						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Ban")
+						confirm_action.OnTapped = func() {
+							req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/guilds/%s/bans/%s", guild_id_textbox.Text, usr_id_textbox.Text), nil)
+							if err != nil {
+								dialog.ShowError(err, program)
+							}
+							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn_textbox.Text))
+							c := &http.Client{}
+							res, err := c.Do(req)
+							if err != nil {
+								dialog.ShowError(err, program)
+							} else if res.StatusCode != 204 {
+								var body struct {
+									Message string
+								}
+								bytes, _ := io.ReadAll(res.Body)
+								j.Unmarshal(bytes, &body)
+								dialog.ShowInformation("Error", body.Message, program)
+							} else {
+								dialog.ShowInformation("Success", "The user has been successfully banned!", program)
+							}
+						}
 						break
 					}
 				case "Unban a user":
