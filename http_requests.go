@@ -61,7 +61,7 @@ func main() {
 	})
 	tkn := widget.NewPasswordEntry()
 	tkn.SetPlaceHolder("Insert bot token")
-	login.SetContent(container.NewVBox(tkn, widget.NewButton("Validate", func() {
+	login.SetContent(container.NewVBox(layout.NewSpacer(), tkn, widget.NewButton("Validate", func() {
 		req, err := http.NewRequest("POST", "https://discord.com/api/v10/auth/login", nil)
 		if err != nil {
 			dialog.ShowError(err, login)
@@ -79,38 +79,38 @@ func main() {
 			j.Unmarshal(bytes, &body)
 			dialog.ShowInformation("Error", body.Message, login)
 		} else {
-			req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
-			if err != nil {
-				dialog.ShowError(err, login)
-			}
-			req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-			c := &http.Client{}
-			res, err := c.Do(req)
-			if err != nil {
-				dialog.ShowError(err, login)
-			}
-			var bots struct {
-				Id       string
-				Username string
-			}
-			bytes, _ := io.ReadAll(res.Body)
-			j.Unmarshal(bytes, &bots)
-			req, err = http.NewRequest("GET", "https://discord.com/api/v10/users/@me/guilds", nil)
-			if err != nil {
-				dialog.ShowError(err, login)
-			}
-			req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-			c = &http.Client{}
-			res, err = c.Do(req)
-			if err != nil {
-				dialog.ShowError(err, login)
-			}
-			var guilds []struct{}
-			bytes, _ = io.ReadAll(res.Body)
-			j.Unmarshal(bytes, &guilds)
-			bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
 			login.Hide()
 			navbar := container.NewHBox(widget.NewButton("Bot Info", func() {
+				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
+				if err != nil {
+					dialog.ShowError(err, login)
+				}
+				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+				c := &http.Client{}
+				res, err := c.Do(req)
+				if err != nil {
+					dialog.ShowError(err, login)
+				}
+				var bots struct {
+					Id       string
+					Username string
+				}
+				bytes, _ := io.ReadAll(res.Body)
+				j.Unmarshal(bytes, &bots)
+				req, err = http.NewRequest("GET", "https://discord.com/api/v10/users/@me/guilds", nil)
+				if err != nil {
+					dialog.ShowError(err, login)
+				}
+				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+				c = &http.Client{}
+				res, err = c.Do(req)
+				if err != nil {
+					dialog.ShowError(err, login)
+				}
+				var guilds []struct{}
+				bytes, _ = io.ReadAll(res.Body)
+				j.Unmarshal(bytes, &guilds)
+				bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
 				bot.Show()
 			}), layout.NewSpacer(), widget.NewButton("Logout", func() {
 				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
@@ -752,7 +752,7 @@ func main() {
 			program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 			program.Show()
 		}
-	})))
+	}), layout.NewSpacer()))
 	login.Show()
 	a.Run()
 }
