@@ -20,6 +20,7 @@ func main() {
 	a := app.New()
 	login := a.NewWindow("Login")
 	program := a.NewWindow("http_requests")
+	bot := a.NewWindow("bot_info")
 	fileName := "icon.png"
 	file, err := os.Open(fileName)
 	if err == nil {
@@ -30,13 +31,34 @@ func main() {
 		file.Read(fileSlice)
 		login.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 		program.SetIcon(fyne.NewStaticResource(fileName, fileByte))
+		bot.SetIcon(fyne.NewStaticResource(fileName, fileByte))
 	}
 	login.Resize(fyne.NewSize(670, 170))
 	program.Resize(fyne.NewSize(400, 240))
+	bot.Resize(fyne.NewSize(400, 200))
 	login.SetFixedSize(true)
 	program.SetFixedSize(true)
+	bot.SetFixedSize(true)
 	login.CenterOnScreen()
 	program.CenterOnScreen()
+	bot.CenterOnScreen()
+	show := false
+	program.SetCloseIntercept(func() {
+		if !show {
+			dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+				if b {
+					login.Show()
+					program.Hide()
+				} else {
+					show = false
+				}
+			}, program)
+			show = true
+		}
+	})
+	bot.SetCloseIntercept(func() {
+		bot.Hide()
+	})
 	tkn := widget.NewPasswordEntry()
 	tkn.SetPlaceHolder("Insert bot token")
 	login.SetContent(container.NewVBox(tkn, widget.NewButton("Validate", func() {
@@ -67,29 +89,37 @@ func main() {
 			if err != nil {
 				dialog.ShowError(err, login)
 			}
-			var body struct {
+			var bots struct {
 				Id       string
 				Username string
 			}
 			bytes, _ := io.ReadAll(res.Body)
-			j.Unmarshal(bytes, &body)
-			botId := body.Id
-			botUsername := body.Username
+			j.Unmarshal(bytes, &bots)
+			req, err = http.NewRequest("GET", "https://discord.com/api/v10/users/@me/guilds", nil)
+			if err != nil {
+				dialog.ShowError(err, login)
+			}
+			req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+			c = &http.Client{}
+			res, err = c.Do(req)
+			if err != nil {
+				dialog.ShowError(err, login)
+			}
+			var guilds []struct{}
+			bytes, _ = io.ReadAll(res.Body)
+			j.Unmarshal(bytes, &guilds)
+			bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
 			login.Hide()
-			show := false
-			program.SetCloseIntercept(func() {
-				if !show {
-					dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-						if b {
-							login.Show()
-							program.Hide()
-						} else {
-							show = false
-						}
-					}, program)
-					show = true
-				}
-			})
+			navbar := container.NewHBox(widget.NewButton("Bot Info", func() {
+				bot.Show()
+			}), layout.NewSpacer(), widget.NewButton("Logout", func() {
+				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
+					if b {
+						login.Show()
+						program.Hide()
+					}
+				}, program)
+			}))
 			chn_id := widget.NewEntry()
 			chn_id.SetPlaceHolder("Insert channel ID")
 			msg := widget.NewMultiLineEntry()
@@ -141,14 +171,7 @@ func main() {
 				switch s {
 				case "Write a message":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
 						confirm_action.OnTapped = func() {
@@ -182,14 +205,7 @@ func main() {
 				case "Edit a message":
 					{
 						program.Resize(fyne.NewSize(400, 270))
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, msg, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, msg, confirm_action)))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
@@ -221,14 +237,7 @@ func main() {
 					}
 				case "Pin a message":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Pin")
 						confirm_action.OnTapped = func() {
@@ -256,14 +265,7 @@ func main() {
 					}
 				case "Create a channel":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, chn_type, chn_name, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, chn_type, chn_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Create")
 						confirm_action.OnTapped = func() {
@@ -359,14 +361,7 @@ func main() {
 					}
 				case "Edit a channel":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, chn_name, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, chn_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
@@ -399,14 +394,7 @@ func main() {
 					}
 				case "Create a thread":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, thread_name, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, thread_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 220))
 						confirm_action.SetText("Create")
 						confirm_action.OnTapped = func() {
@@ -439,14 +427,7 @@ func main() {
 					}
 				case "Delete a channel":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, confirm_action)))
 						program.Resize(fyne.NewSize(400, 150))
 						confirm_action.SetText("Delete")
 						confirm_action.OnTapped = func() {
@@ -473,14 +454,7 @@ func main() {
 					}
 				case "Delete a message":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Delete")
 						confirm_action.OnTapped = func() {
@@ -512,14 +486,7 @@ func main() {
 					}
 				case "Unpin a message":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Unpin")
 						confirm_action.OnTapped = func() {
@@ -547,14 +514,7 @@ func main() {
 					}
 				case "Kick a user":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Kick")
 						confirm_action.OnTapped = func() {
@@ -582,14 +542,7 @@ func main() {
 					}
 				case "Ban a user":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Ban")
 						confirm_action.OnTapped = func() {
@@ -617,14 +570,7 @@ func main() {
 					}
 				case "Unban a user":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Unban")
 						confirm_action.OnTapped = func() {
@@ -652,14 +598,7 @@ func main() {
 					}
 				case "Create a role":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, role_name, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, role_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Create")
 						confirm_action.OnTapped = func() {
@@ -692,14 +631,7 @@ func main() {
 					}
 				case "Edit a role":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, role_id, role_name, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, role_id, role_name, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
@@ -732,14 +664,7 @@ func main() {
 					}
 				case "Delete a role":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, role_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, role_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 200))
 						confirm_action.SetText("Delete")
 						confirm_action.OnTapped = func() {
@@ -767,14 +692,7 @@ func main() {
 					}
 				case "Add a role to a member":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, role_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, role_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Add")
 						confirm_action.OnTapped = func() {
@@ -802,14 +720,7 @@ func main() {
 					}
 				case "Remove a role from a member":
 					{
-						program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-							dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-								if b {
-									login.Show()
-									program.Hide()
-								}
-							}, program)
-						}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, role_id, confirm_action)))
+						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(guild_id, actions, usr_id, role_id, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Remove")
 						confirm_action.OnTapped = func() {
@@ -838,14 +749,7 @@ func main() {
 				}
 			}
 			actions.SetSelected("Write a message")
-			program.SetContent(container.NewBorder(container.NewHBox(widget.NewLabel(botId), layout.NewSpacer(), widget.NewButton("Logout", func() {
-				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-					if b {
-						login.Show()
-						program.Hide()
-					}
-				}, program)
-			}), layout.NewSpacer(), widget.NewLabel(botUsername)), nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
+			program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 			program.Show()
 		}
 	})))
