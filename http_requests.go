@@ -117,8 +117,11 @@ func main() {
 					if b {
 						login.Show()
 						program.Hide()
+					} else {
+						show = false
 					}
 				}, program)
+				show = true
 			}))
 			chn_id := widget.NewEntry()
 			chn_id.SetPlaceHolder("Insert channel ID")
