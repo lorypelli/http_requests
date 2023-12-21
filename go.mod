@@ -2,7 +2,10 @@ module http_requests
 
 go 1.21.5
 
-require fyne.io/fyne/v2 v2.4.2
+require (
+	fyne.io/fyne/v2 v2.4.2
+	github.com/gorilla/websocket v1.5.1
+)
 
 require (
 	fyne.io/systray v1.10.1-0.20231115130155-104f5ef7839e // indirect

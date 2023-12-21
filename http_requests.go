@@ -4,6 +4,7 @@ import (
 	b "bytes"
 	j "encoding/json"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"io"
 	"net/http"
 	"os"
@@ -51,19 +52,6 @@ func main() {
 	program.SetIcon(icon)
 	bot.SetIcon(icon)
 	show := false
-	program.SetCloseIntercept(func() {
-		if !show {
-			dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-				if b {
-					login.Show()
-					program.Hide()
-				} else {
-					show = false
-				}
-			}, program)
-			show = true
-		}
-	})
 	bot.SetCloseIntercept(func() {
 		bot.Hide()
 	})
@@ -88,6 +76,66 @@ func main() {
 			dialog.ShowInformation("Error", body.Message, login)
 		} else {
 			login.Hide()
+			logout := func(b bool) {
+				ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
+				if b {
+					payload := map[string]interface{}{
+						"op": 2,
+						"d": map[string]interface{}{
+							"token":   tkn.Text,
+							"intents": 0,
+							"properties": map[string]interface{}{
+								"os":      "linux",
+								"browser": "http_requests",
+								"device":  "discord",
+							},
+							"presence": map[string]interface{}{
+								"activities": []map[string]interface{}{
+									{
+										"name": "disconnecting...",
+										"type": 3,
+									},
+								},
+								"status": "idle",
+							},
+						},
+					}
+					ws.WriteJSON(payload)
+					login.Show()
+					program.Hide()
+				} else {
+					show = false
+				}
+			}
+			program.SetCloseIntercept(func() {
+				if !show {
+					dialog.ShowConfirm("Logout", "Are you sure you want to logout?", logout, program)
+					show = true
+				}
+			})
+			ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
+			payload := map[string]interface{}{
+				"op": 2,
+				"d": map[string]interface{}{
+					"token":   tkn.Text,
+					"intents": 0,
+					"properties": map[string]interface{}{
+						"os":      "linux",
+						"browser": "http_requests",
+						"device":  "discord",
+					},
+					"presence": map[string]interface{}{
+						"activities": []map[string]interface{}{
+							{
+								"name": "http_requests",
+								"type": 3,
+							},
+						},
+						"status": "dnd",
+					},
+				},
+			}
+			ws.WriteJSON(payload)
 			navbar := container.NewHBox(widget.NewButton("Bot Info", func() {
 				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 				if err != nil {
@@ -121,14 +169,7 @@ func main() {
 				bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
 				bot.Show()
 			}), layout.NewSpacer(), widget.NewButton("Logout", func() {
-				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", func(b bool) {
-					if b {
-						login.Show()
-						program.Hide()
-					} else {
-						show = false
-					}
-				}, program)
+				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", logout, program)
 				show = true
 			}))
 			chn_id := widget.NewEntry()
