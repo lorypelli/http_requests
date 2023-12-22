@@ -80,6 +80,9 @@ func main() {
 	program.SetIcon(icon)
 	bot.SetIcon(icon)
 	show := false
+	login.SetCloseIntercept(func() {
+		a.Quit()
+	})
 	bot.SetCloseIntercept(func() {
 		bot.Hide()
 	})
