@@ -20,7 +20,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func gateway(tkn string) {
+func connect(tkn string) {
 	ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
 	payload := map[string]interface{}{
 		"op": 2,
@@ -44,6 +44,23 @@ func gateway(tkn string) {
 		},
 	}
 	ws.WriteJSON(payload)
+}
+
+func checkStatus(tkn string, timer *time.Ticker, stop chan struct{}) {
+	connect(tkn)
+	for {
+		select {
+		case <-stop:
+			{
+				timer.Stop()
+				return
+			}
+		case <-timer.C:
+			{
+				connect(tkn)
+			}
+		}
+	}
 }
 
 func main() {
@@ -96,6 +113,7 @@ func main() {
 		req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 		c := &http.Client{}
 		res, err := c.Do(req)
+		timer := time.NewTicker(120 * time.Second)
 		if err != nil {
 			dialog.ShowError(err, login)
 		} else if res.StatusCode != 200 {
@@ -109,6 +127,9 @@ func main() {
 			login.Hide()
 			logout := func(b bool) {
 				if b {
+					stop := make(chan struct{})
+					go checkStatus(tkn.Text, timer, stop)
+					close(stop)
 					login.Show()
 					program.Hide()
 				} else {
@@ -121,13 +142,7 @@ func main() {
 					show = true
 				}
 			})
-			timer := time.NewTicker(120 * time.Second)
-			go func() {
-				gateway(tkn.Text)
-				for range timer.C {
-					gateway(tkn.Text)
-				}
-			}()
+			go checkStatus(tkn.Text, timer, nil)
 			navbar := container.NewHBox(widget.NewButton("Bot Info", func() {
 				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 				if err != nil {
