@@ -16,6 +16,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
@@ -71,19 +72,25 @@ func main() {
 	req, _ := http.NewRequest("GET", "https://raw.githubusercontent.com/lorypelli/http_requests/main/icon.png", nil)
 	c := &http.Client{}
 	res, _ := c.Do(req)
-	homeDirectory, _ := os.UserHomeDir()
-	path := fmt.Sprintf("%s/http_requests/", homeDirectory)
-	os.MkdirAll(path, os.ModePerm)
-	filePath := filepath.Join(path, "icon.png")
-	file, _ := os.Create(filePath)
-	io.Copy(file, res.Body)
-	file, _ = os.Open(filePath)
-	stats, _ := os.Stat(filePath)
-	size := stats.Size()
-	fileBytes := make([]byte, size)
-	fileSlice := fileBytes[:]
-	file.Read(fileSlice)
-	icon := fyne.NewStaticResource("icon.png", fileBytes)
+	_, ok := a.(desktop.App)
+	if (ok) {
+		homeDirectory, _ := os.UserHomeDir()
+		path := fmt.Sprintf("%s/http_requests/", homeDirectory)
+		os.MkdirAll(path, os.ModePerm)
+		filePath := filepath.Join(path, "icon.png")
+		file, _ := os.Create(filePath)
+		io.Copy(file, res.Body)
+		file, _ = os.Open(filePath)
+		stats, _ := os.Stat(filePath)
+		size := stats.Size()
+		fileBytes := make([]byte, size)
+		fileSlice := fileBytes[:]
+		file.Read(fileSlice)
+		icon := fyne.NewStaticResource("icon.png", fileBytes)
+		login.SetIcon(icon)
+		program.SetIcon(icon)
+		bot.SetIcon(icon)
+	}
 	login.Resize(fyne.NewSize(670, 170))
 	program.Resize(fyne.NewSize(400, 240))
 	bot.Resize(fyne.NewSize(400, 200))
@@ -93,9 +100,6 @@ func main() {
 	login.CenterOnScreen()
 	program.CenterOnScreen()
 	bot.CenterOnScreen()
-	login.SetIcon(icon)
-	program.SetIcon(icon)
-	bot.SetIcon(icon)
 	show := false
 	login.SetCloseIntercept(func() {
 		a.Quit()
