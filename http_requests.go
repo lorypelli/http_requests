@@ -4,11 +4,13 @@ import (
 	b "bytes"
 	j "encoding/json"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
+
+	"github.com/gorilla/websocket"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -17,6 +19,32 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
+
+func gateway(tkn string) {
+	ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
+	payload := map[string]interface{}{
+		"op": 2,
+		"d": map[string]interface{}{
+			"token":   tkn,
+			"intents": 0,
+			"properties": map[string]interface{}{
+				"os":      "linux",
+				"browser": "http_requests",
+				"device":  "discord",
+			},
+			"presence": map[string]interface{}{
+				"activities": []map[string]interface{}{
+					{
+						"name": "http_requests",
+						"type": 3,
+					},
+				},
+				"status": "dnd",
+			},
+		},
+	}
+	ws.WriteJSON(payload)
+}
 
 func main() {
 	a := app.New()
@@ -77,30 +105,7 @@ func main() {
 		} else {
 			login.Hide()
 			logout := func(b bool) {
-				ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
 				if b {
-					payload := map[string]interface{}{
-						"op": 2,
-						"d": map[string]interface{}{
-							"token":   tkn.Text,
-							"intents": 0,
-							"properties": map[string]interface{}{
-								"os":      "linux",
-								"browser": "http_requests",
-								"device":  "discord",
-							},
-							"presence": map[string]interface{}{
-								"activities": []map[string]interface{}{
-									{
-										"name": "disconnecting...",
-										"type": 3,
-									},
-								},
-								"status": "idle",
-							},
-						},
-					}
-					ws.WriteJSON(payload)
 					login.Show()
 					program.Hide()
 				} else {
@@ -113,29 +118,13 @@ func main() {
 					show = true
 				}
 			})
-			ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
-			payload := map[string]interface{}{
-				"op": 2,
-				"d": map[string]interface{}{
-					"token":   tkn.Text,
-					"intents": 0,
-					"properties": map[string]interface{}{
-						"os":      "linux",
-						"browser": "http_requests",
-						"device":  "discord",
-					},
-					"presence": map[string]interface{}{
-						"activities": []map[string]interface{}{
-							{
-								"name": "http_requests",
-								"type": 3,
-							},
-						},
-						"status": "dnd",
-					},
-				},
-			}
-			ws.WriteJSON(payload)
+			timer := time.NewTicker(120 * time.Second)
+			go func() {
+				gateway(tkn.Text)
+				for range timer.C {
+					gateway(tkn.Text)
+				}
+			}()
 			navbar := container.NewHBox(widget.NewButton("Bot Info", func() {
 				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 				if err != nil {
