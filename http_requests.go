@@ -172,7 +172,7 @@ func main() {
 			msg_id.SetPlaceHolder("Insert message ID")
 			guild_id := widget.NewEntry()
 			guild_id.SetPlaceHolder("Insert guild ID")
-			chn_type := widget.NewSelect([]string{"Text", "Voice", "Stage", "Announcement", "Forum", "Media"}, func(s string) {})
+			chn_type := widget.NewSelect([]string{"Text", "Voice", "Stage", "Announcement", "Forum", "Media"}, nil)
 			chn_type.SetSelected("Text")
 			chn_name := widget.NewEntry()
 			chn_name.SetPlaceHolder("Insert channel name")
