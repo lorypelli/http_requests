@@ -69,11 +69,12 @@ func main() {
 	login := a.NewWindow("Login")
 	program := a.NewWindow("http_requests")
 	bot := a.NewWindow("bot_info")
+	msg_list := a.NewWindow("msg_list")
 	req, _ := http.NewRequest("GET", "https://raw.githubusercontent.com/lorypelli/http_requests/main/icon.png", nil)
 	c := &http.Client{}
 	res, _ := c.Do(req)
 	_, ok := a.(desktop.App)
-	if (ok) {
+	if ok {
 		homeDirectory, _ := os.UserHomeDir()
 		path := fmt.Sprintf("%s/http_requests/", homeDirectory)
 		os.MkdirAll(path, os.ModePerm)
@@ -90,22 +91,28 @@ func main() {
 		login.SetIcon(icon)
 		program.SetIcon(icon)
 		bot.SetIcon(icon)
+		msg_list.SetIcon(icon)
 	}
 	login.Resize(fyne.NewSize(670, 170))
 	program.Resize(fyne.NewSize(400, 240))
 	bot.Resize(fyne.NewSize(400, 200))
+	msg_list.Resize(fyne.NewSize(1280, 720))
 	login.SetFixedSize(true)
 	program.SetFixedSize(true)
 	bot.SetFixedSize(true)
 	login.CenterOnScreen()
 	program.CenterOnScreen()
 	bot.CenterOnScreen()
+	msg_list.CenterOnScreen()
 	show := false
 	login.SetCloseIntercept(func() {
 		a.Quit()
 	})
 	bot.SetCloseIntercept(func() {
 		bot.Hide()
+	})
+	msg_list.SetCloseIntercept(func() {
+		msg_list.Hide()
 	})
 	tkn := widget.NewPasswordEntry()
 	tkn.SetPlaceHolder("Insert bot token")
@@ -147,44 +154,106 @@ func main() {
 				}
 			})
 			go checkStatus(tkn.Text, timer, nil)
-			navbar := container.NewHBox(widget.NewButton("Bot Info", func() {
+			bot_info := widget.NewButton("Bot Info", func() {
 				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 				if err != nil {
-					dialog.ShowError(err, login)
+					dialog.ShowError(err, program)
 				}
 				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 				c := &http.Client{}
 				res, err := c.Do(req)
 				if err != nil {
-					dialog.ShowError(err, login)
+					dialog.ShowError(err, program)
+				} else if res.StatusCode != 200 {
+					var body struct {
+						Message string
+					}
+					bytes, _ := io.ReadAll(res.Body)
+					j.Unmarshal(bytes, &body)
+					dialog.ShowInformation("Error", body.Message, program)
+				} else {
+					var bots struct {
+						Id       string
+						Username string
+					}
+					bytes, _ := io.ReadAll(res.Body)
+					j.Unmarshal(bytes, &bots)
+					req, err = http.NewRequest("GET", "https://discord.com/api/v10/users/@me/guilds", nil)
+					if err != nil {
+						dialog.ShowError(err, program)
+					}
+					req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+					c = &http.Client{}
+					res, err = c.Do(req)
+					if err != nil {
+						dialog.ShowError(err, program)
+					} else if res.StatusCode != 200 {
+						var body struct {
+							Message string
+						}
+						bytes, _ := io.ReadAll(res.Body)
+						j.Unmarshal(bytes, &body)
+						dialog.ShowInformation("Error", body.Message, program)
+					} else {
+						var guilds []struct{}
+						bytes, _ = io.ReadAll(res.Body)
+						j.Unmarshal(bytes, &guilds)
+						bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
+						bot.Show()
+					}
 				}
-				var bots struct {
-					Id       string
-					Username string
-				}
-				bytes, _ := io.ReadAll(res.Body)
-				j.Unmarshal(bytes, &bots)
-				req, err = http.NewRequest("GET", "https://discord.com/api/v10/users/@me/guilds", nil)
-				if err != nil {
-					dialog.ShowError(err, login)
-				}
-				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-				c = &http.Client{}
-				res, err = c.Do(req)
-				if err != nil {
-					dialog.ShowError(err, login)
-				}
-				var guilds []struct{}
-				bytes, _ = io.ReadAll(res.Body)
-				j.Unmarshal(bytes, &guilds)
-				bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
-				bot.Show()
-			}), layout.NewSpacer(), widget.NewButton("Logout", func() {
+			})
+			logout_btn := widget.NewButton("Logout", func() {
 				dialog.ShowConfirm("Logout", "Are you sure you want to logout?", logout, program)
 				show = true
-			}))
+			})
+			navbar := container.NewHBox(bot_info, layout.NewSpacer(), logout_btn)
 			chn_id := widget.NewEntry()
 			chn_id.SetPlaceHolder("Insert channel ID")
+			show_msg_list := widget.NewButton("Show Message List", func() {
+				req, err := http.NewRequest("GET", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages?limit=100", chn_id.Text), nil)
+				if err != nil {
+					dialog.ShowError(err, program)
+				}
+				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
+				c := &http.Client{}
+				res, err := c.Do(req)
+				if err != nil {
+					dialog.ShowError(err, program)
+				} else if res.StatusCode != 200 {
+					var body struct {
+						Message string
+					}
+					bytes, _ := io.ReadAll(res.Body)
+					j.Unmarshal(bytes, &body)
+					dialog.ShowInformation("Error", body.Message, program)
+				} else {
+					type msg struct {
+						Author struct {
+							Username string
+						}
+						Content string
+					}
+					bytes, _ := io.ReadAll(res.Body)
+					msgs := []msg{}
+					j.Unmarshal(bytes, &msgs)
+					vbox := container.NewVBox()
+					for i := len(msgs) - 1; i >= 0; i-- {
+						content := widget.NewLabel(msgs[i].Content)
+						if (len(msgs[i].Content) == 0) {
+							content = widget.NewLabel("No Content!")
+							content.TextStyle.Bold = true
+							content.TextStyle.Italic = true
+						}
+						vbox.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
+					}
+					scroll := container.NewScroll(vbox)
+					scroll.SetMinSize(fyne.NewSize(1280, 720))
+					msg_list.SetContent(scroll)
+					msg_list.Show()
+				}
+			})
+			navbar_edit := container.NewHBox(bot_info, layout.NewSpacer(), show_msg_list, layout.NewSpacer(), logout_btn)
 			msg := widget.NewMultiLineEntry()
 			msg.SetPlaceHolder("Insert message")
 			msg_id := widget.NewEntry()
@@ -234,7 +303,7 @@ func main() {
 				switch s {
 				case "Write a message":
 					{
-						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
+						program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
 						confirm_action.OnTapped = func() {
@@ -812,7 +881,7 @@ func main() {
 				}
 			}
 			actions.SetSelected("Write a message")
-			program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
+			program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
 			program.Show()
 		}
 	}), layout.NewSpacer()))
