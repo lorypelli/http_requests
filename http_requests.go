@@ -255,7 +255,10 @@ func main() {
 			})
 			navbar_edit := container.NewHBox(bot_info, layout.NewSpacer(), show_msg_list, layout.NewSpacer(), logout_btn)
 			msg := widget.NewMultiLineEntry()
+			msg.Wrapping = fyne.TextWrapWord
 			msg.SetPlaceHolder("Insert message")
+			count := widget.NewLabel("0")
+			msg_box := container.NewStack(msg, container.NewHBox(layout.NewSpacer(), container.NewBorder(nil, count, nil, nil)))
 			msg_id := widget.NewEntry()
 			msg_id.SetPlaceHolder("Insert message ID")
 			guild_id := widget.NewEntry()
@@ -299,11 +302,17 @@ func main() {
 				}
 			})
 			actions := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, nil)
+			msg.OnChanged = func(s string) {
+				count.SetText(fmt.Sprint(len(s)))
+				if (len(msg.Text) > 4096) {
+					confirm_action.Disable()
+				}
+			}
 			actions.OnChanged = func(s string) {
 				switch s {
 				case "Write a message":
 					{
-						program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
+						program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_box, confirm_action)))
 						program.Resize(fyne.NewSize(400, 240))
 						confirm_action.SetText("Send")
 						confirm_action.OnTapped = func() {
@@ -337,7 +346,7 @@ func main() {
 				case "Edit a message":
 					{
 						program.Resize(fyne.NewSize(400, 270))
-						program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, msg, confirm_action)))
+						program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, msg_box, confirm_action)))
 						confirm_action.SetText("Edit")
 						confirm_action.OnTapped = func() {
 							body := map[string]interface{}{
@@ -881,7 +890,7 @@ func main() {
 				}
 			}
 			actions.SetSelected("Write a message")
-			program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg, confirm_action)))
+			program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_box, confirm_action)))
 			program.Show()
 		}
 	}), layout.NewSpacer()))
