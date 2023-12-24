@@ -21,7 +21,29 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func connect(tkn string) {
+func connect(tkn string, act_description string, act_type any, act_status string) {
+	switch act_type {
+	case "Game":
+		{
+			act_type = 0
+			break
+		}
+	case "Listening":
+		{
+			act_type = 2
+			break
+		}
+	case "Watching":
+		{
+			act_type = 3
+			break
+		}
+	case "Competing":
+		{
+			act_type = 5
+			break
+		}
+	}
 	ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
 	payload := map[string]interface{}{
 		"op": 2,
@@ -36,19 +58,19 @@ func connect(tkn string) {
 			"presence": map[string]interface{}{
 				"activities": []map[string]interface{}{
 					{
-						"name": "http_requests",
-						"type": 3,
+						"name": act_description,
+						"type": act_type,
 					},
 				},
-				"status": "dnd",
+				"status": act_status,
 			},
 		},
 	}
 	ws.WriteJSON(payload)
 }
 
-func checkStatus(tkn string, timer *time.Ticker, stop chan struct{}) {
-	connect(tkn)
+func checkStatus(tkn string, act_name string, act_type any, act_status string, timer *time.Ticker, stop chan struct{}) {
+	connect(tkn, act_name, act_type, act_status)
 	for {
 		select {
 		case <-stop:
@@ -58,7 +80,7 @@ func checkStatus(tkn string, timer *time.Ticker, stop chan struct{}) {
 			}
 		case <-timer.C:
 			{
-				connect(tkn)
+				connect(tkn, act_name, act_type, act_status)
 			}
 		}
 	}
@@ -70,6 +92,13 @@ func main() {
 	program := a.NewWindow("http_requests")
 	bot := a.NewWindow("bot_info")
 	msg_list := a.NewWindow("msg_list")
+	act_type := widget.NewSelect([]string{"Game", "Listening", "Watching", "Competing"}, nil)
+	act_type.SetSelected("Watching")
+	act_description := widget.NewEntry()
+	act_description.Text = "http_requests"
+	act_description.SetPlaceHolder("Insert detailed activity")
+	act_status := widget.NewSelect([]string{"online", "idle", "dnd"}, nil)
+	act_status.SetSelected("dnd")
 	req, _ := http.NewRequest("GET", "https://raw.githubusercontent.com/lorypelli/http_requests/main/icon.png", nil)
 	c := &http.Client{}
 	res, _ := c.Do(req)
@@ -93,7 +122,7 @@ func main() {
 		bot.SetIcon(icon)
 		msg_list.SetIcon(icon)
 	}
-	login.Resize(fyne.NewSize(670, 170))
+	login.Resize(fyne.NewSize(670, 165))
 	program.Resize(fyne.NewSize(400, 240))
 	bot.Resize(fyne.NewSize(400, 200))
 	msg_list.Resize(fyne.NewSize(1280, 720))
@@ -116,7 +145,7 @@ func main() {
 	})
 	tkn := widget.NewPasswordEntry()
 	tkn.SetPlaceHolder("Insert bot token")
-	login.SetContent(container.NewVBox(layout.NewSpacer(), tkn, widget.NewButton("Validate", func() {
+	validate := widget.NewButton("Validate", func() {
 		req, err := http.NewRequest("POST", "https://discord.com/api/v10/auth/login", nil)
 		if err != nil {
 			dialog.ShowError(err, login)
@@ -139,7 +168,7 @@ func main() {
 			logout := func(b bool) {
 				if b {
 					stop := make(chan struct{})
-					go checkStatus(tkn.Text, timer, stop)
+					go checkStatus(tkn.Text, act_description.Text, act_type.Selected, act_status.Selected, timer, stop)
 					close(stop)
 					login.Show()
 					program.Hide()
@@ -153,7 +182,7 @@ func main() {
 					show = true
 				}
 			})
-			go checkStatus(tkn.Text, timer, nil)
+			go checkStatus(tkn.Text, act_description.Text, act_type.Selected, act_status.Selected, timer, nil)
 			bot_info := widget.NewButton("Bot Info", func() {
 				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 				if err != nil {
@@ -240,7 +269,7 @@ func main() {
 					vbox := container.NewVBox()
 					for i := len(msgs) - 1; i >= 0; i-- {
 						content := widget.NewLabel(msgs[i].Content)
-						if (len(msgs[i].Content) == 0) {
+						if len(msgs[i].Content) == 0 {
 							content = widget.NewLabel("No Content!")
 							content.TextStyle.Bold = true
 							content.TextStyle.Italic = true
@@ -304,7 +333,7 @@ func main() {
 			actions := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, nil)
 			msg.OnChanged = func(s string) {
 				count.SetText(fmt.Sprint(len(s)))
-				if (len(msg.Text) > 4096) {
+				if len(msg.Text) > 4096 {
 					confirm_action.Disable()
 				}
 			}
@@ -893,7 +922,29 @@ func main() {
 			program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_box, confirm_action)))
 			program.Show()
 		}
-	}), layout.NewSpacer()))
+	})
+	custom_activity := widget.NewCheck("Custom Activity", nil)
+	activity_box := container.NewGridWithRows(1)
+	box := container.NewBorder(nil, nil, container.NewHBox(act_type, act_status), nil, act_description)
+	custom_activity.OnChanged = func(b bool) {
+		if b {
+			activity_box.Add(box)
+			activity_box.Refresh()
+			act_description.OnChanged = func(s string) {
+				if len(s) > 32 {
+					validate.Disable()
+				} else {
+					validate.Enable()
+				}
+			}
+		} else {
+			activity_box.RemoveAll()
+			activity_box.Refresh()
+			act_type.SetSelected("Watching")
+			act_description.Text = "http_requests"
+		}
+	}
+	login.SetContent(container.NewVBox(container.NewCenter(custom_activity), tkn, validate, activity_box))
 	login.Show()
 	a.Run()
 }
