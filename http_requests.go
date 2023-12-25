@@ -14,6 +14,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
@@ -129,6 +130,7 @@ func main() {
 	login.SetFixedSize(true)
 	program.SetFixedSize(true)
 	bot.SetFixedSize(true)
+	msg_list.SetFixedSize(true)
 	login.CenterOnScreen()
 	program.CenterOnScreen()
 	bot.CenterOnScreen()
@@ -172,6 +174,8 @@ func main() {
 					close(stop)
 					login.Show()
 					program.Hide()
+					msg_list.Hide()
+					bot.Hide()
 				} else {
 					show = false
 				}
@@ -204,6 +208,7 @@ func main() {
 					var bots struct {
 						Id       string
 						Username string
+						Avatar   string
 					}
 					bytes, _ := io.ReadAll(res.Body)
 					j.Unmarshal(bytes, &bots)
@@ -227,8 +232,21 @@ func main() {
 						var guilds []struct{}
 						bytes, _ = io.ReadAll(res.Body)
 						j.Unmarshal(bytes, &guilds)
-						bot.SetContent(container.NewCenter(container.NewVBox(widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
-						bot.Show()
+						var img fyne.Resource
+						if bots.Avatar == "" {
+							img, err = fyne.LoadResourceFromURLString("https://cdn.discordapp.com/embed/avatars/0.png")
+						} else {
+							img, err = fyne.LoadResourceFromURLString(fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", bots.Id, bots.Avatar))
+						}
+						if err != nil {
+							dialog.ShowError(err, program)
+						} else {
+							img_box := canvas.NewImageFromResource(img)
+							img_box.FillMode = canvas.ImageFillContain
+							img_box.SetMinSize(fyne.NewSquareSize(32))
+							bot.SetContent(container.NewCenter(container.NewVBox(img_box, widget.NewLabel(fmt.Sprintf("Username: %s", bots.Username)), widget.NewLabel(fmt.Sprintf("ID: %s", bots.Id)), widget.NewLabel(fmt.Sprintf("Server Count: %d", len(guilds))))))
+							bot.Show()
+						}
 					}
 				}
 			})
@@ -259,26 +277,66 @@ func main() {
 				} else {
 					type msg struct {
 						Author struct {
+							Id       string
 							Username string
+							Avatar   string
 						}
 						Content string
 					}
 					bytes, _ := io.ReadAll(res.Body)
 					msgs := []msg{}
 					j.Unmarshal(bytes, &msgs)
-					vbox := container.NewVBox()
+					msgs_container := container.NewVBox()
+					users_container := container.NewVBox()
+					var urls []string
+					var users []string
 					for i := len(msgs) - 1; i >= 0; i-- {
-						content := widget.NewLabel(msgs[i].Content)
-						if len(msgs[i].Content) == 0 {
-							content = widget.NewLabel("No Content!")
-							content.TextStyle.Bold = true
-							content.TextStyle.Italic = true
+						var img fyne.Resource
+						url := fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", msgs[i].Author.Id, msgs[i].Author.Avatar)
+						foundAvatar := false
+						foundUser := false
+						for c := 0; c < len(urls); c++ {
+							if urls[c] == url {
+								foundAvatar = true
+							}
 						}
-						vbox.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
+						urls = append(urls, url)
+						if !foundAvatar {
+							if msgs[i].Author.Avatar == "" {
+								img, err = fyne.LoadResourceFromURLString("https://cdn.discordapp.com/embed/avatars/0.png")
+							} else {
+								img, err = fyne.LoadResourceFromURLString(url)
+							}
+						}
+						if err != nil {
+							dialog.ShowError(err, program)
+						} else {
+							img_box := canvas.NewImageFromResource(img)
+							img_box.FillMode = canvas.ImageFillContain
+							img_box.SetMinSize(fyne.NewSquareSize(32))
+							content := widget.NewLabel(msgs[i].Content)
+							if len(msgs[i].Content) == 0 {
+								content = widget.NewLabel("No Content!")
+								content.TextStyle.Bold = true
+								content.TextStyle.Italic = true
+							}
+							for c := 0; c < len(users); c++ {
+								if users[c] == msgs[i].Author.Username {
+									foundUser = true
+								}
+							}
+							msgs_container.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
+							if !foundUser {
+								users_container.Add(container.NewBorder(nil, nil, container.NewHBox(img_box, widget.NewLabel(msgs[i].Author.Username)), nil))
+							}
+							users = append(users, msgs[i].Author.Username)
+						}
 					}
-					scroll := container.NewScroll(vbox)
-					scroll.SetMinSize(fyne.NewSize(1280, 720))
-					msg_list.SetContent(scroll)
+					msgs_scroll := container.NewScroll(msgs_container)
+					msgs_scroll.SetMinSize(fyne.NewSize(950, 720))
+					users_scroll := container.NewScroll(users_container)
+					users_scroll.SetMinSize(fyne.NewSize(250, 720))
+					msg_list.SetContent(container.NewBorder(nil, nil, msgs_scroll, nil, users_scroll))
 					msg_list.Show()
 				}
 			})
