@@ -333,10 +333,10 @@ func main() {
 						}
 					}
 					msgs_scroll := container.NewScroll(msgs_container)
-					msgs_scroll.SetMinSize(fyne.NewSize(950, 720))
 					users_scroll := container.NewScroll(users_container)
-					users_scroll.SetMinSize(fyne.NewSize(250, 720))
-					msg_list.SetContent(container.NewBorder(nil, nil, msgs_scroll, nil, users_scroll))
+					split_container := container.NewHSplit(msgs_scroll, users_scroll)
+					split_container.SetOffset(0.8)
+					msg_list.SetContent(split_container)
 					msg_list.Show()
 				}
 			})
