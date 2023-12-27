@@ -275,12 +275,14 @@ func main() {
 					j.Unmarshal(bytes, &body)
 					dialog.ShowInformation("Error", body.Message, program)
 				} else {
+					type user struct {
+						Id       string
+						Username string
+						Avatar   string
+						Bot      bool
+					}
 					type msg struct {
-						Author struct {
-							Id       string
-							Username string
-							Avatar   string
-						}
+						Author user
 						Content string
 					}
 					bytes, _ := io.ReadAll(res.Body)
@@ -289,7 +291,7 @@ func main() {
 					msgs_container := container.NewVBox()
 					users_container := container.NewVBox()
 					var urls []string
-					var users []string
+					var users []user
 					for i := len(msgs) - 1; i >= 0; i-- {
 						var img fyne.Resource
 						url := fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", msgs[i].Author.Id, msgs[i].Author.Avatar)
@@ -321,15 +323,27 @@ func main() {
 								content.TextStyle.Italic = true
 							}
 							for c := 0; c < len(users); c++ {
-								if users[c] == msgs[i].Author.Username {
+								if users[c].Username == msgs[i].Author.Username {
 									foundUser = true
 								}
 							}
 							msgs_container.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
+							user := container.NewHBox(img_box, widget.NewLabel(msgs[i].Author.Username))
 							if !foundUser {
-								users_container.Add(container.NewBorder(nil, nil, container.NewHBox(img_box, widget.NewLabel(msgs[i].Author.Username)), nil))
+								if msgs[i].Author.Bot {
+									img, err = fyne.LoadResourceFromURLString("https://cdn.emojidex.com/emoji/seal/Bot_tag.png")
+									if err != nil {
+										dialog.ShowError(err, program)
+									} else {
+										img_box := canvas.NewImageFromResource(img)
+										img_box.FillMode = canvas.ImageFillContain
+										img_box.SetMinSize(fyne.NewSquareSize(32))
+										user.Add(img_box)
+									}
+								}
+								users_container.Add(container.NewBorder(nil, nil, user, nil))
 							}
-							users = append(users, msgs[i].Author.Username)
+							users = append(users, msgs[i].Author)
 						}
 					}
 					msgs_scroll := container.NewScroll(msgs_container)
