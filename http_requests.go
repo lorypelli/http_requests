@@ -315,6 +315,7 @@ func main() {
 						avatar_box.FillMode = canvas.ImageFillContain
 						avatar_box.SetMinSize(fyne.NewSquareSize(32))
 						content := widget.NewLabel(msgs[i].Content)
+						content.Wrapping = fyne.TextWrapWord
 						if len(msgs[i].Content) == 0 {
 							content = widget.NewLabel("No Content!")
 							content.TextStyle.Bold = true
@@ -325,7 +326,7 @@ func main() {
 								foundUser = true
 							}
 						}
-						msgs_container.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
+						msgs_container.Add(container.NewBorder(nil, nil, widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), nil, content))
 						user := container.NewHBox(avatar_box, widget.NewLabel(msgs[i].Author.Username))
 						if !foundUser {
 							if msgs[i].Author.Bot {
