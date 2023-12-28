@@ -282,7 +282,7 @@ func main() {
 						Bot      bool
 					}
 					type msg struct {
-						Author user
+						Author  user
 						Content string
 					}
 					bytes, _ := io.ReadAll(res.Body)
@@ -292,8 +292,9 @@ func main() {
 					users_container := container.NewVBox()
 					var urls []string
 					var users []user
+					bot_logo, _ := fyne.LoadResourceFromURLString("https://cdn.emojidex.com/emoji/seal/Bot_tag.png")
 					for i := len(msgs) - 1; i >= 0; i-- {
-						var img fyne.Resource
+						var avatar fyne.Resource
 						url := fmt.Sprintf("https://cdn.discordapp.com/avatars/%s/%s.png", msgs[i].Author.Id, msgs[i].Author.Avatar)
 						foundAvatar := false
 						foundUser := false
@@ -305,46 +306,37 @@ func main() {
 						urls = append(urls, url)
 						if !foundAvatar {
 							if msgs[i].Author.Avatar == "" {
-								img, err = fyne.LoadResourceFromURLString("https://cdn.discordapp.com/embed/avatars/0.png")
+								avatar, _ = fyne.LoadResourceFromURLString("https://cdn.discordapp.com/embed/avatars/0.png")
 							} else {
-								img, err = fyne.LoadResourceFromURLString(url)
+								avatar, _ = fyne.LoadResourceFromURLString(url)
 							}
 						}
-						if err != nil {
-							dialog.ShowError(err, program)
-						} else {
-							img_box := canvas.NewImageFromResource(img)
-							img_box.FillMode = canvas.ImageFillContain
-							img_box.SetMinSize(fyne.NewSquareSize(32))
-							content := widget.NewLabel(msgs[i].Content)
-							if len(msgs[i].Content) == 0 {
-								content = widget.NewLabel("No Content!")
-								content.TextStyle.Bold = true
-								content.TextStyle.Italic = true
-							}
-							for c := 0; c < len(users); c++ {
-								if users[c].Username == msgs[i].Author.Username {
-									foundUser = true
-								}
-							}
-							msgs_container.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
-							user := container.NewHBox(img_box, widget.NewLabel(msgs[i].Author.Username))
-							if !foundUser {
-								if msgs[i].Author.Bot {
-									img, err = fyne.LoadResourceFromURLString("https://cdn.emojidex.com/emoji/seal/Bot_tag.png")
-									if err != nil {
-										dialog.ShowError(err, program)
-									} else {
-										img_box := canvas.NewImageFromResource(img)
-										img_box.FillMode = canvas.ImageFillContain
-										img_box.SetMinSize(fyne.NewSquareSize(32))
-										user.Add(img_box)
-									}
-								}
-								users_container.Add(container.NewBorder(nil, nil, user, nil))
-							}
-							users = append(users, msgs[i].Author)
+						avatar_box := canvas.NewImageFromResource(avatar)
+						avatar_box.FillMode = canvas.ImageFillContain
+						avatar_box.SetMinSize(fyne.NewSquareSize(32))
+						content := widget.NewLabel(msgs[i].Content)
+						if len(msgs[i].Content) == 0 {
+							content = widget.NewLabel("No Content!")
+							content.TextStyle.Bold = true
+							content.TextStyle.Italic = true
 						}
+						for c := 0; c < len(users); c++ {
+							if users[c].Username == msgs[i].Author.Username {
+								foundUser = true
+							}
+						}
+						msgs_container.Add(container.NewHBox(widget.NewLabel(fmt.Sprintf("%s :", msgs[i].Author.Username)), content))
+						user := container.NewHBox(avatar_box, widget.NewLabel(msgs[i].Author.Username))
+						if !foundUser {
+							if msgs[i].Author.Bot {
+								bot_logo_box := canvas.NewImageFromResource(bot_logo)
+								bot_logo_box.FillMode = canvas.ImageFillContain
+								bot_logo_box.SetMinSize(fyne.NewSquareSize(32))
+								user.Add(bot_logo_box)
+							}
+							users_container.Add(container.NewBorder(nil, nil, user, nil))
+						}
+						users = append(users, msgs[i].Author)
 					}
 					msgs_scroll := container.NewScroll(msgs_container)
 					users_scroll := container.NewScroll(users_container)
