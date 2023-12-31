@@ -339,9 +339,7 @@ func main() {
 						}
 						users = append(users, msgs[i].Author)
 					}
-					msgs_scroll := container.NewScroll(msgs_container)
-					users_scroll := container.NewScroll(users_container)
-					split_container := container.NewHSplit(msgs_scroll, users_scroll)
+					split_container := container.NewHSplit(container.NewScroll(msgs_container), container.NewScroll(users_container))
 					split_container.SetOffset(0.8)
 					msg_list.SetContent(split_container)
 					msg_list.Show()
@@ -1006,7 +1004,7 @@ func main() {
 			activity_box.RemoveAll()
 			activity_box.Refresh()
 			act_type.SetSelected("Watching")
-			act_description.Text = "http_requests"
+			act_description.SetText("http_requests")
 		}
 	}
 	login.SetContent(container.NewVBox(container.NewCenter(custom_activity), tkn, validate, activity_box))
