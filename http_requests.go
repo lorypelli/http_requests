@@ -22,7 +22,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func connect(tkn string, act_description string, act_type any, act_status string) {
+func connect(tkn, act_description, act_status string, act_type any) {
 	switch act_type {
 	case "Game":
 		{
@@ -70,8 +70,8 @@ func connect(tkn string, act_description string, act_type any, act_status string
 	ws.WriteJSON(payload)
 }
 
-func checkStatus(tkn string, act_name string, act_type any, act_status string, timer *time.Ticker, stop chan struct{}) {
-	connect(tkn, act_name, act_type, act_status)
+func checkStatus(tkn, act_name, act_status string, act_type any, timer *time.Ticker, stop chan struct{}) {
+	connect(tkn, act_name, act_status, act_type)
 	for {
 		select {
 		case <-stop:
@@ -81,7 +81,7 @@ func checkStatus(tkn string, act_name string, act_type any, act_status string, t
 			}
 		case <-timer.C:
 			{
-				connect(tkn, act_name, act_type, act_status)
+				connect(tkn, act_name, act_status, act_type)
 			}
 		}
 	}
