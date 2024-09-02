@@ -1,2 +1,4 @@
+*.exe
+*.exe~
 node_modules
 bin
