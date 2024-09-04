@@ -4,4 +4,6 @@ linux:
 	@GOOS=linux go build -o bin/http_requests_linux http_requests.go
 darwin:
 	@GOOS=darwin go build -o bin/http_requests_darwin http_requests.go
+run:
+	@go build -o bin/http_requests.exe && cd bin && http_requests.exe
 all: windows linux darwin

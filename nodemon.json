@@ -1,4 +1,4 @@
 {
-    "exec": "go run http_requests.go",
+    "exec": "make run",
     "ext": "go"
 }
