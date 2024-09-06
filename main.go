@@ -4,13 +4,12 @@ import (
 	b "bytes"
 	j "encoding/json"
 	"fmt"
+	act "http_requests/functions"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/gorilla/websocket"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -21,71 +20,6 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
-
-func connect(tkn, act_description, act_status string, act_type any) {
-	switch act_type {
-	case "Game":
-		{
-			act_type = 0
-			break
-		}
-	case "Listening":
-		{
-			act_type = 2
-			break
-		}
-	case "Watching":
-		{
-			act_type = 3
-			break
-		}
-	case "Competing":
-		{
-			act_type = 5
-			break
-		}
-	}
-	ws, _, _ := websocket.DefaultDialer.Dial("wss://gateway.discord.gg/?v=10&encoding=json", nil)
-	payload := map[string]interface{}{
-		"op": 2,
-		"d": map[string]interface{}{
-			"token":   tkn,
-			"intents": 0,
-			"properties": map[string]interface{}{
-				"os":      "linux",
-				"browser": "http_requests",
-				"device":  "discord",
-			},
-			"presence": map[string]interface{}{
-				"activities": []map[string]interface{}{
-					{
-						"name": act_description,
-						"type": act_type,
-					},
-				},
-				"status": act_status,
-			},
-		},
-	}
-	ws.WriteJSON(payload)
-}
-
-func checkStatus(tkn, act_name, act_status string, act_type any, timer *time.Ticker, stop chan struct{}) {
-	connect(tkn, act_name, act_status, act_type)
-	for {
-		select {
-		case <-stop:
-			{
-				timer.Stop()
-				return
-			}
-		case <-timer.C:
-			{
-				connect(tkn, act_name, act_status, act_type)
-			}
-		}
-	}
-}
 
 func main() {
 	a := app.New()
@@ -170,7 +104,7 @@ func main() {
 			logout := func(b bool) {
 				if b {
 					stop := make(chan struct{})
-					go checkStatus(tkn.Text, act_description.Text, act_type.Selected, act_status.Selected, timer, stop)
+					go act.Connect(tkn.Text, act_description.Text, act_type.Selected, act_status.Selected, timer, stop)
 					close(stop)
 					login.Show()
 					program.Hide()
@@ -186,7 +120,7 @@ func main() {
 					show = true
 				}
 			})
-			go checkStatus(tkn.Text, act_description.Text, act_type.Selected, act_status.Selected, timer, nil)
+			go act.Connect(tkn.Text, act_description.Text, act_type.Selected, act_status.Selected, timer, nil)
 			bot_info := widget.NewButton("Bot Info", func() {
 				req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 				if err != nil {
@@ -368,30 +302,7 @@ func main() {
 			role_name := widget.NewEntry()
 			role_name.SetPlaceHolder("Insert role name")
 			confirm_action := widget.NewButton("Send", func() {
-				body := map[string]interface{}{
-					"content": msg.Text,
-				}
-				json, _ := j.Marshal(body)
-				req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id.Text), b.NewBuffer(json))
-				if err != nil {
-					dialog.ShowError(err, program)
-				}
-				req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-				req.Header.Add("Content-Type", "application/json")
-				c := &http.Client{}
-				res, err := c.Do(req)
-				if err != nil {
-					dialog.ShowError(err, program)
-				} else if res.StatusCode != 200 {
-					var body struct {
-						Message string
-					}
-					bytes, _ := io.ReadAll(res.Body)
-					j.Unmarshal(bytes, &body)
-					dialog.ShowInformation("Error", body.Message, program)
-				} else {
-					dialog.ShowInformation("Success", "The message has been successfully sent!", program)
-				}
+				act.Send(msg, chn_id, tkn, program)
 			})
 			actions := widget.NewSelect([]string{"Write a message", "Edit a message", "Pin a message", "Create a channel", "Edit a channel", "Create a thread", "Delete a channel", "Delete a message", "Unpin a message", "Kick a user", "Ban a user", "Unban a user", "Create a role", "Edit a role", "Delete a role", "Add a role to a member", "Remove a role from a member"}, nil)
 			msg.OnChanged = func(s string) {
@@ -404,35 +315,7 @@ func main() {
 				switch s {
 				case "Write a message":
 					{
-						program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_box, confirm_action)))
-						program.Resize(fyne.NewSize(400, 240))
-						confirm_action.SetText("Send")
-						confirm_action.OnTapped = func() {
-							body := map[string]interface{}{
-								"content": msg.Text,
-							}
-							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id.Text), b.NewBuffer(json))
-							if err != nil {
-								dialog.ShowError(err, program)
-							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-							req.Header.Add("Content-Type", "application/json")
-							c := &http.Client{}
-							res, err := c.Do(req)
-							if err != nil {
-								dialog.ShowError(err, program)
-							} else if res.StatusCode != 200 {
-								var body struct {
-									Message string
-								}
-								bytes, _ := io.ReadAll(res.Body)
-								j.Unmarshal(bytes, &body)
-								dialog.ShowInformation("Error", body.Message, program)
-							} else {
-								dialog.ShowInformation("Success", "The message has been successfully sent!", program)
-							}
-						}
+						act.WriteMessage(navbar_edit, msg_box, msg, chn_id, tkn, actions, confirm_action, program)
 						break
 					}
 				case "Edit a message":
