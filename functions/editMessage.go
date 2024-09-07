@@ -34,8 +34,7 @@ func internalEditMessage(tkn, msg, chn_id, msg_id *widget.Entry) {
 	}
 	req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 	req.Header.Add("Content-Type", "application/json")
-	c := &http.Client{}
-	res, err := c.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	} else if res.StatusCode != 200 {

@@ -20,8 +20,7 @@ func BotInfo(tkn *widget.Entry) {
 		dialog.ShowError(err, windows.Program)
 	}
 	req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-	c := &http.Client{}
-	res, err := c.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	} else if res.StatusCode != 200 {

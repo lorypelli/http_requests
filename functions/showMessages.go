@@ -14,7 +14,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func showMessages(tkn, chn_id *widget.Entry) {
+func ShowMessages(tkn, chn_id *widget.Entry) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages?limit=100", chn_id.Text), nil)
 	if err != nil {
 		dialog.ShowError(err, windows.Program)

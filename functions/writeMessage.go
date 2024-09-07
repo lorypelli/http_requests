@@ -14,16 +14,16 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func WriteMessage(navbar_edit, msg_box *fyne.Container, msg, chn_id, tkn *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
+func WriteMessage(navbar_edit, msg_box *fyne.Container, tkn, msg, chn_id *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
 	windows.Program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_box, confirm_action)))
 	windows.Program.Resize(fyne.NewSize(400, 240))
 	confirm_action.SetText("Send")
 	confirm_action.OnTapped = func() {
-		internalWriteMessage(msg, chn_id, tkn)
+		internalWriteMessage(tkn, msg, chn_id)
 	}
 }
 
-func internalWriteMessage(msg, chn_id, tkn *widget.Entry) {
+func internalWriteMessage(tkn, msg, chn_id *widget.Entry) {
 	body := map[string]interface{}{
 		"content": msg.Text,
 	}
@@ -34,8 +34,7 @@ func internalWriteMessage(msg, chn_id, tkn *widget.Entry) {
 	}
 	req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
 	req.Header.Add("Content-Type", "application/json")
-	c := &http.Client{}
-	res, err := c.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	} else if res.StatusCode != 200 {
