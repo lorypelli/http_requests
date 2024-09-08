@@ -5,7 +5,7 @@ import (
 	j "encoding/json"
 	"fmt"
 	act "http_requests/functions"
-	windows "http_requests/globals"
+	"http_requests/windows"
 	"io"
 	"net/http"
 	"time"
@@ -138,96 +138,18 @@ func main() {
 					}
 				case "Edit a channel":
 					{
-						windows.Program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, chn_name, confirm_action)))
-						windows.Program.Resize(fyne.NewSize(400, 200))
-						confirm_action.SetText("Edit")
-						confirm_action.OnTapped = func() {
-							body := map[string]interface{}{
-								"name": chn_name.Text,
-							}
-							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id.Text), b.NewBuffer(json))
-							if err != nil {
-								dialog.ShowError(err, windows.Program)
-							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-							req.Header.Add("Content-Type", "application/json")
-							c := &http.Client{}
-							res, err := c.Do(req)
-							if err != nil {
-								dialog.ShowError(err, windows.Program)
-							} else if res.StatusCode != 200 {
-								var body struct {
-									Message string
-								}
-								bytes, _ := io.ReadAll(res.Body)
-								j.Unmarshal(bytes, &body)
-								dialog.ShowInformation("Error", body.Message, windows.Program)
-							} else {
-								dialog.ShowInformation("Success", "The channel has been successfully edited!", windows.Program)
-							}
-						}
+						act.EditChannel(navbar, chn_name, tkn, chn_id, actions, confirm_action)
 						break
 					}
 				case "Create a thread":
 					{
-						windows.Program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, thread_name, confirm_action)))
-						windows.Program.Resize(fyne.NewSize(400, 220))
-						confirm_action.SetText("Create")
-						confirm_action.OnTapped = func() {
-							body := map[string]interface{}{
-								"name": thread_name.Text,
-							}
-							json, _ := j.Marshal(body)
-							req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages/%s/threads", chn_id.Text, msg_id.Text), b.NewBuffer(json))
-							if err != nil {
-								dialog.ShowError(err, windows.Program)
-							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-							req.Header.Add("Content-Type", "application/json")
-							c := &http.Client{}
-							res, err := c.Do(req)
-							if err != nil {
-								dialog.ShowError(err, windows.Program)
-							} else if res.StatusCode != 201 {
-								var body struct {
-									Message string
-								}
-								bytes, _ := io.ReadAll(res.Body)
-								j.Unmarshal(bytes, &body)
-								dialog.ShowInformation("Error", body.Message, windows.Program)
-							} else {
-								dialog.ShowInformation("Success", "The thread has been successfully created!", windows.Program)
-							}
-						}
+						act.CreateThread(navbar, chn_id, tkn, msg_id, thread_name, actions, confirm_action)
 						break
 					}
 				case "Delete a channel":
 					{
-						windows.Program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, confirm_action)))
-						windows.Program.Resize(fyne.NewSize(400, 150))
-						confirm_action.SetText("Delete")
-						confirm_action.OnTapped = func() {
-							req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id.Text), nil)
-							if err != nil {
-								dialog.ShowError(err, windows.Program)
-							}
-							req.Header.Add("Authorization", fmt.Sprintf("Bot %s", tkn.Text))
-							c := &http.Client{}
-							res, err := c.Do(req)
-							if err != nil {
-								dialog.ShowError(err, windows.Program)
-							} else if res.StatusCode != 200 {
-								var body struct {
-									Message string
-								}
-								bytes, _ := io.ReadAll(res.Body)
-								j.Unmarshal(bytes, &body)
-								dialog.ShowInformation("Error", body.Message, windows.Program)
-							} else {
-								dialog.ShowInformation("Success", "The channel has been successfully deleted!", windows.Program)
-							}
-						}
+						act.DeleteChannel(navbar, chn_id, tkn, actions, confirm_action)
+						break
 					}
 				case "Delete a message":
 					{

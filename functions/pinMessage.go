@@ -3,7 +3,7 @@ package actions
 import (
 	j "encoding/json"
 	"fmt"
-	"http_requests/globals"
+	"http_requests/windows"
 	"io"
 	"net/http"
 

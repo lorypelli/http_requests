@@ -14,21 +14,21 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func WriteMessage(navbar_edit, msg_box *fyne.Container, tkn, msg, chn_id *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
-	windows.Program.SetContent(container.NewBorder(navbar_edit, nil, nil, nil, container.NewVBox(chn_id, actions, msg_box, confirm_action)))
-	windows.Program.Resize(fyne.NewSize(400, 240))
-	confirm_action.SetText("Send")
+func EditChannel(navbar *fyne.Container, chn_name, tkn, chn_id *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
+	windows.Program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, chn_name, confirm_action)))
+	windows.Program.Resize(fyne.NewSize(400, 200))
+	confirm_action.SetText("Edit")
 	confirm_action.OnTapped = func() {
-		internalWriteMessage(tkn, msg, chn_id)
+		internalEditChannel(chn_name, tkn, chn_id)
 	}
 }
 
-func internalWriteMessage(tkn, msg, chn_id *widget.Entry) {
+func internalEditChannel(chn_name, tkn, chn_id *widget.Entry) {
 	body := map[string]interface{}{
-		"content": msg.Text,
+		"name": chn_name.Text,
 	}
 	json, _ := j.Marshal(body)
-	req, err := http.NewRequest("POST", fmt.Sprintf("https://discord.com/api/v10/channels/%s/messages", chn_id.Text), b.NewBuffer(json))
+	req, err := http.NewRequest("PATCH", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id.Text), b.NewBuffer(json))
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	}
@@ -45,6 +45,6 @@ func internalWriteMessage(tkn, msg, chn_id *widget.Entry) {
 		j.Unmarshal(bytes, &body)
 		dialog.ShowInformation("Error", body.Message, windows.Program)
 	} else {
-		dialog.ShowInformation("Success", "The message has been successfully sent!", windows.Program)
+		dialog.ShowInformation("Success", "The channel has been successfully edited!", windows.Program)
 	}
 }
