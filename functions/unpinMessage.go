@@ -11,17 +11,17 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func PinMessage(navbar *fyne.Container, msg_id, tkn, chn_id *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
+func UnpinMessage(navbar *fyne.Container, msg_id, tkn, chn_id *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
 	windows.Program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, msg_id, confirm_action)))
 	windows.Program.Resize(fyne.NewSize(400, 200))
-	confirm_action.SetText("Pin")
+	confirm_action.SetText("Unpin")
 	confirm_action.OnTapped = func() {
-		internalPinMessage(msg_id, tkn, chn_id)
+		internalUnpinMessage(msg_id, tkn, chn_id)
 	}
 }
 
-func internalPinMessage(msg_id, tkn, chn_id *widget.Entry) {
-	req, err := http.NewRequest("PUT", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id.Text, msg_id.Text), nil)
+func internalUnpinMessage(msg_id, tkn, chn_id *widget.Entry) {
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s/pins/%s", chn_id.Text, msg_id.Text), nil)
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	}
@@ -32,6 +32,6 @@ func internalPinMessage(msg_id, tkn, chn_id *widget.Entry) {
 	} else if res.StatusCode != 204 {
 		ShowError(res.Body)
 	} else {
-		dialog.ShowInformation("Success", "The message has been successfully pinned!", windows.Program)
+		dialog.ShowInformation("Success", "The message has been successfully unpinned!", windows.Program)
 	}
 }

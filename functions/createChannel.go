@@ -5,7 +5,6 @@ import (
 	j "encoding/json"
 	"fmt"
 	"http_requests/windows"
-	"io"
 	"net/http"
 
 	"fyne.io/fyne/v2"
@@ -77,12 +76,7 @@ func internalCreateChannel(chn_name, tkn, guild_id *widget.Entry, choice uint8) 
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	} else if res.StatusCode != 201 {
-		var body struct {
-			Message string
-		}
-		bytes, _ := io.ReadAll(res.Body)
-		j.Unmarshal(bytes, &body)
-		dialog.ShowInformation("Error", body.Message, windows.Program)
+		ShowError(res.Body)
 	} else {
 		dialog.ShowInformation("Success", "The channel has been successfully created!", windows.Program)
 	}

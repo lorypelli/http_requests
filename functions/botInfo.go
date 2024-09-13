@@ -47,12 +47,7 @@ func BotInfo(tkn *widget.Entry) {
 		if err != nil {
 			dialog.ShowError(err, windows.Program)
 		} else if res.StatusCode != 200 {
-			var body struct {
-				Message string
-			}
-			bytes, _ := io.ReadAll(res.Body)
-			j.Unmarshal(bytes, &body)
-			dialog.ShowInformation("Error", body.Message, windows.Program)
+			ShowError(res.Body)
 		} else {
 			var guilds []struct{}
 			bytes, _ = io.ReadAll(res.Body)

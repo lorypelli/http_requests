@@ -1,10 +1,8 @@
 package actions
 
 import (
-	j "encoding/json"
 	"fmt"
 	"http_requests/windows"
-	"io"
 	"net/http"
 
 	"fyne.io/fyne/v2"
@@ -13,16 +11,16 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func DeleteChannel(navbar *fyne.Container, tkn, chn_id *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
+func DeleteChannel(navbar *fyne.Container, chn_id, tkn *widget.Entry, actions *widget.Select, confirm_action *widget.Button) {
 	windows.Program.SetContent(container.NewBorder(navbar, nil, nil, nil, container.NewVBox(chn_id, actions, confirm_action)))
 	windows.Program.Resize(fyne.NewSize(400, 150))
 	confirm_action.SetText("Delete")
 	confirm_action.OnTapped = func() {
-		internalDeleteChannel(tkn, chn_id)
+		internalDeleteChannel(chn_id, tkn)
 	}
 }
 
-func internalDeleteChannel(tkn, chn_id *widget.Entry) {
+func internalDeleteChannel(chn_id, tkn *widget.Entry) {
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("https://discord.com/api/v10/channels/%s", chn_id.Text), nil)
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
@@ -32,12 +30,7 @@ func internalDeleteChannel(tkn, chn_id *widget.Entry) {
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	} else if res.StatusCode != 200 {
-		var body struct {
-			Message string
-		}
-		bytes, _ := io.ReadAll(res.Body)
-		j.Unmarshal(bytes, &body)
-		dialog.ShowInformation("Error", body.Message, windows.Program)
+		ShowError(res.Body)
 	} else {
 		dialog.ShowInformation("Success", "The channel has been successfully deleted!", windows.Program)
 	}

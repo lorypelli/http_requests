@@ -5,7 +5,6 @@ import (
 	j "encoding/json"
 	"fmt"
 	"http_requests/windows"
-	"io"
 	"net/http"
 
 	"fyne.io/fyne/v2"
@@ -38,12 +37,7 @@ func internalEditMessage(tkn, msg, chn_id, msg_id *widget.Entry) {
 	if err != nil {
 		dialog.ShowError(err, windows.Program)
 	} else if res.StatusCode != 200 {
-		var body struct {
-			Message string
-		}
-		bytes, _ := io.ReadAll(res.Body)
-		j.Unmarshal(bytes, &body)
-		dialog.ShowInformation("Error", body.Message, windows.Program)
+		ShowError(res.Body)
 	} else {
 		dialog.ShowInformation("Success", "The message has been successfully edited!", windows.Program)
 	}
